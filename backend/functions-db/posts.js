@@ -1,7 +1,7 @@
 var sql = require('./db-init.js');
 var db = sql.getDb();
 
-exports.createPost(image, description, userId) {
+exports.createPost = (image, description, userId) => {
     // upload image somehow
     var url = "debug";
 
