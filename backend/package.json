@@ -1,0 +1,19 @@
+{
+  "name": "instagram-clone-backend",
+  "version": "1.0.0",
+  "description": "Insta clone backend side",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "instagram",
+    "clone",
+    "backend"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sqlite3": "^4.0.4"
+  }
+}
