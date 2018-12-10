@@ -1,3 +1,6 @@
+# Temporary file from SQLite browser
+*.db-journal
+
 # Logs
 logs
 *.log
