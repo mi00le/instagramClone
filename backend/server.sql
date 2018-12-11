@@ -3,7 +3,9 @@ CREATE TABLE `Posts` (
     `AuthorID` INTEGER NOT NULL,
     `Url` TEXT NOT NULL,
     `CreatedAt` DATE NOT NULL,
-    `Description` TEXT, `Tags` TEXT,
+    `Title` TEXT,
+    `Description` TEXT,
+    `Tags` TEXT,
     FOREIGN KEY(`AuthorID`) REFERENCES Users(ID)
 );
 
