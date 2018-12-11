@@ -3,7 +3,9 @@ CREATE TABLE `Posts` (
     `AuthorID` INTEGER NOT NULL,
     `Url` TEXT NOT NULL,
     `CreatedAt` DATE NOT NULL,
-    `Description` TEXT, `Tags` TEXT,
+    `Title` TEXT,
+    `Description` TEXT,
+    `Tags` TEXT,
     FOREIGN KEY(`AuthorID`) REFERENCES Users(ID)
 );
 
@@ -11,5 +13,6 @@ CREATE TABLE `Users` (
     `ID` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     `Email` TEXT NOT NULL,
     `Password` TEXT NOT NULL,
+    `Salt` TEXT NOT NULL,
     `DisplayName` TEXT NOT NULL
 );
