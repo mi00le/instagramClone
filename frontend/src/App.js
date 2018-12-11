@@ -1,107 +1,99 @@
 import React, { Component } from 'react';
-// import logo from './logo.svg';
-import img from './img.jpg';
 import './App.css';
 import { Button,Grid,Row,Col,Navbar,Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCamera } from '@fortawesome/free-solid-svg-icons'
 
 const imgStyle = {
-
-  width : 500,
-  heigth : 500
-
+  width : "100%"
 };
 
-//title img auth
-let userPost = [{
-  title : "Good Morning",
-  img : img,
-  user : "Michael"
-}];
+const gridItem = {
+  margin : "20px auto",
+  float: "none",
+};
 
-// console.log(userPost[0]);
-
-
+let userPosts = [{author: "nan",
+url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
+title:"My First Post",
+createdAt:"Today",
+description:"This was my first post"},
+{author: "Wibly2",
+url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
+title:"My second Post",
+createdAt:"Yesterday",
+description:"This was my second post"},
+{author: "kariez",
+url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
+title:"My worst Post",
+createdAt:"today",
+description:"Dont"}]
 
 class App extends Component {
-
-  // state = {
-  //   selectedFile : null
-  // }
-  //
-  // fileSelectedHandler = event => {
-  //   this.setState({
-  //     selectedFile : event.target.files[0]
-  //   })
-  // }
-  //
-  // fileUploadHandler = () => {
-  //
-  // }
-
   render() {
     return (
       <div className="App">
-      <header className="App-header">
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
-      {/* <input type="file" id="file" onChange={this.fileSelectedHandler}/>
-      <label for="fileupload"> Select a file to upload</label>
-      <input type="submit" value="submit" onClick={this.fileSelectedHandler} />
-      <p>{userPost[0].title}</p>
-      <img src={userPost[0].img} style={imgStyle} />
-      <p>{userPost[0].user}</p> */}
-
-      <Navbar inverse collapseOnSelect >
-  <Navbar.Header>
-    <Navbar.Brand>
-      <a href="#brand">React-Bootstrap</a>
-    </Navbar.Brand>
-    <Navbar.Toggle />
-  </Navbar.Header>
-  <Navbar.Collapse>
-    <Nav>
-      <NavItem eventKey={1} href="#">
-        Link
-      </NavItem>
-      <NavItem eventKey={2} href="#">
-        Link
-      </NavItem>
-      <NavDropdown eventKey={3} title="Dropdown" id="basic-nav-dropdown">
-        <MenuItem eventKey={3.1}>Action</MenuItem>
-        <MenuItem eventKey={3.2}>Another action</MenuItem>
-        <MenuItem eventKey={3.3}>Something else here</MenuItem>
-        <MenuItem divider />
-        <MenuItem eventKey={3.3}>Separated link</MenuItem>
-      </NavDropdown>
-    </Nav>
-    <Nav pullRight>
-      <NavItem eventKey={1} href="#">
-        Link Right
-      </NavItem>
-      <NavItem eventKey={2} href="#">
-        Link Right
-      </NavItem>
-    </Nav>
-  </Navbar.Collapse>
-</Navbar>
-
-
-      <Grid>
-        <Row className="show-grid">
-          <Col sm={6} md={6}>
-            <img src={"https://via.placeholder.com/300"} />
-          </Col>
-          <Col sm={6} md={6}>
-            <img src={"https://via.placeholder.com/300"} />
-          </Col>
-        </Row>
-      </Grid>
-
-
-
+      <header>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
       </header>
+        <NAVBAR />
+        <Posts items={userPosts} />
       </div>
     );
+  }
+}
+
+class Posts extends Component {
+  constructor(props) {
+    super(props);
+  }
+  Item () {
+    let items = [];
+    for (var i = this.props.items.length - 1; i >= 0; i--) {
+      items.push(
+        <Col sm={12} md={8} style={gridItem}>
+          <h3>{this.props.items[i].title}</h3>
+          <img style={imgStyle} src={this.props.items[i].url} />
+          <p>{this.props.items[i].description}</p>
+          <p>by <a href="#">{this.props.items[i].author}</a></p>
+          <p>{this.props.items[i].createdAt}</p>
+        </Col>);
+      if (i != 0) {
+        items.push(<hr/>);
+      }
+    }
+    return items;
+  }
+
+  render() {
+    return(
+      <Grid>
+        <Row className="show-grid">
+          {this.Item()}
+        </Row>
+      </Grid>
+    );
+  }
+}
+
+class NAVBAR extends Component {
+ render(){
+   return(
+     <Navbar inverse fixedTop >
+       <Grid style={{color: "#fff"}}>
+         <Row className="show-grid">
+           <Col xs={4} sm={4} md={4}>
+             <Nav pullLeft>
+               <FontAwesomeIcon href="#brand" icon={faCamera} style={{"fontSize" : "20px", "textAlign" : "left"}} />
+             </Nav>
+           </Col>
+           <Col xs={4} sm={4} md={4}>
+             <p style={{"fontSize" : "20px"}}>InstaClone</p>
+           </Col>
+         </Row>
+       </Grid>
+     </Navbar>
+   );
   }
 }
 
