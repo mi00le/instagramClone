@@ -15,16 +15,18 @@ app.get("/", (req, res) => {
 
 app.route("/login").get((req, res) => {
 	dbUsers.logIn("AAAAAA", "bbbbbb"); // testing only
-	res.send("Hi");
+	res.redirect("/");
 }).post((req, res) => {
 	if (req.body.email && req.body.password) {
-		dbUsers.logIn(req.body.email, req.body.password);
+		dbUsers.logIn(req.body.email, req.body.password, (success) => {
+			res.json({success: success});
+		});
 	}
 });
 
 app.route("/createUser").post((req, res) => {
 	if (req.body.email && req.body.password && req.body.displayName) {
-		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, () => {
+		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, (success) => {
 			res.redirect("/");
 		});
 	}

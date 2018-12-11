@@ -11,5 +11,6 @@ CREATE TABLE `Users` (
     `ID` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     `Email` TEXT NOT NULL,
     `Password` TEXT NOT NULL,
+    `Salt` TEXT NOT NULL,
     `DisplayName` TEXT NOT NULL
 );
