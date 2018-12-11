@@ -72,11 +72,16 @@ exports.createUser = (email, password, displayName, callback) => {
 exports.deleteUser = (userId, callback) => {
     console.log("Attempt delete user");
 
-    db.run("DELETE FROM Users WHERE ID=?", userId, (err) => {
-        if (err) console.log(err.message);
-        else console.log("Deleted.");
+    db.run("DELETE FROM Posts WHERE AuthorID=?", userId, (err) => {
+        if (err) {
+            if (callback && callback instanceof Function) callback(false);
+        } else {
+            db.run("DELETE FROM Users WHERE ID=?", userId, (err) => {
+                if (err) console.log(err.message);
+                else console.log("Deleted.");
 
-        if (callback && callback instanceof Function) callback(!(err));
+                if (callback && callback instanceof Function) callback(!(err));
+            });
+        }
     });
-
 };
