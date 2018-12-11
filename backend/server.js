@@ -24,7 +24,9 @@ app.route("/login").get((req, res) => {
 
 app.route("/createUser").post((req, res) => {
 	if (req.body.email && req.body.password && req.body.displayName) {
-		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName);
+		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, () => {
+			res.redirect("/");
+		});
 	}
 });
 
@@ -32,8 +34,12 @@ app.post("/publish", (req, res) => {
 	res.json({ success: false });
 });
 
-app.delete("/delete", (req, res) => {
-	res.json({ success: false });
+app.post("/deleteUser", (req, res) => {
+	if (req.body.userId) {
+		dbUsers.deleteUser(req.body.userId, (success) => {
+			res.json({success: success});
+		});
+	}
 });
 
 app.listen(port, () => {
