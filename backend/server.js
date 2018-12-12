@@ -7,42 +7,83 @@ var dbPosts = require('./functions-db/posts.js');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-var port = process.env.PORT || 80;
+var port = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-	res.json({ response: "test success" });
+app.route("/users").get((req, res) => {
+	dbUsers.getAllUsers((result, users) => {
+		if (result && !!(users)) {
+			res.json({success: true, users: users});
+		} else {
+			res.json({success: false});
+		}
+	});
+}).post((req, res) => {
+	if (req.body.email && req.body.password && req.body.displayName) {
+		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, (result) => {
+			res.json({success: result});
+		});
+	} else res.json({success: false});
 });
 
-app.route("/login").get((req, res) => {
-	dbUsers.logIn("AAAAAA", "bbbbbb"); // testing only
-	res.redirect("/");
+app.route("/users/:userId").get((req, res) => {
+	dbUsers.getUser(req.params.userId, (result, user) => {
+		if (result && !!(user)) {
+			res.json({success: true, user: user});
+		} else {
+			res.json({success: false});
+		}
+	})
 }).post((req, res) => {
 	if (req.body.email && req.body.password) {
-		dbUsers.logIn(req.body.email, req.body.password, (success) => {
-			res.json({success: success});
+		dbUsers.authenticateUser(req.body.email, req.body.password, (result) => {
+			res.json({success: result});
 		});
+	} else {
+		res.json({success: false});
 	}
+}).delete((req, res) => {
+	dbUsers.deleteUser(req.params.userId, (result) => {
+		res.json({success: result});
+	});
 });
 
-app.route("/createUser").post((req, res) => {
-	if (req.body.email && req.body.password && req.body.displayName) {
-		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, (success) => {
-			res.redirect("/");
-		});
-	}
+app.route("/posts/:userId").get((req, res) => {
+	dbPosts.getAllPostsFromUser(req.params.userId, (result, posts) => {
+		if (result && !!(posts)) {
+			res.json({success: true, posts: posts});
+		} else res.json({success: false});
+	})
+}).post((req, res) => {
+	dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.params.userId, (result) => {
+		res.json({success: result});
+	});
 });
 
-app.post("/publish", (req, res) => {
-	res.json({ success: false });
+app.route("/posts/:userId/:postId").get((req, res) => {
+	dbPosts.getPost(req.params.postId, (result, post) => {
+		if (result && !!(post)) {
+			if (req.params.userId === post.userId) {
+				res.json({success: true, post: post});
+			} else {
+				res.json({success: false});
+			}
+		} else {
+			res.json({success: false});
+		}
+	})
+}).post((req, res) => {
+	dbPosts.updatePost(req.params.postId, req.body.title, req.body.description, req.body.tags, (result) => {
+		res.json({success: result});
+	});
+}).delete((req, res) => {
+	dbPosts.deletePost(req.params.postId, (result) => {
+		res.json({success: result});
+	});
 });
 
-app.post("/deleteUser", (req, res) => {
-	if (req.body.userId) {
-		dbUsers.deleteUser(req.body.userId, (success) => {
-			res.json({success: success});
-		});
-	}
-});
+app.use((req, res) => {
+	res.status(404).send(req.originalUrl + " not found");
+})
 
 app.listen(port, () => {
 	console.log("Node listening on port " + port + "...");

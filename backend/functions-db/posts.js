@@ -22,6 +22,48 @@ exports.createPost = (image, title, description, tags, userId, callback) => {
     });
 };
 
+exports.getPost = (postId, callback) => {
+    db.get("SELECT * FROM Posts WHERE ID=?", postId, (err, row) => {
+        if (err) {
+            console.log(err.message);
+        } else if (row) {
+            if (callback && callback instanceof Function) callback(true, {
+                id: row.ID,
+                userId: row.AuthorID,
+                url: row.Url,
+                createdAt: row.CreatedAt,
+                title: row.Title,
+                description: row.Description,
+                tags: row.Tags
+            });
+            return;
+        }
+        if (callback && callback instanceof Function) callback(false);
+    })
+};
+
+exports.getAllPostsFromUser = (userId, callback) => {
+    db.all("SELECT * FROM Posts WHERE AuthorID=?", userId, (err, rows) => {
+        if (err) console.log(err.message);
+        if (rows.length > 0) {
+            var result = [];
+            for (var obj of rows) {
+                result.push({
+                    id: obj.ID,
+                    userId: obj.AuthorID,
+                    url: obj.Url,
+                    createdAt: obj.CreatedAt,
+                    title: obj.Title,
+                    description: obj.Description,
+                    tags: obj.Tags
+                });
+            }
+            if (callback && callback instanceof Function) callback(true, result);
+        }
+        if (callback && callback instanceof Function) callback(false);
+    });
+};
+
 exports.updatePost = (postId, title, description, tags, callback) => {
     db.get("SELECT * FROM Posts WHERE ID=?", postId, (err, row) => {
         if (row) {
