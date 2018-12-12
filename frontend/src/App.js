@@ -1,11 +1,30 @@
-import React, { Component } from 'react';
-import './App.css';
-import { Button,Grid,Row,Col,Navbar,Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCamera } from '@fortawesome/free-solid-svg-icons'
+import React, { Component } from "react";
+import "./App.css";
+import {
+  Button,
+  Grid,
+  Row,
+  Col,
+  Navbar,
+  Nav,
+  NavItem,
+  NavDropdown,
+  MenuItem,
+  DropdownButton
+} from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCamera } from "@fortawesome/free-solid-svg-icons";
+
+import Popup from "reactjs-popup";
+
+
+
+const inputStyle = {
+  width: "100%"
+};
 
 const imgStyle = {
-  width : "100%"
+  width: "100%"
 };
 
 let gridItem = {
@@ -17,6 +36,7 @@ let gridItem = {
   borderRadius: 3,
   padding: "0",
   background: "#fff",
+  
 };
 let gridText = {
   margin: 10,
@@ -36,7 +56,7 @@ description:"This was my second post"},
 url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
 title:"My worst Post",
 createdAt:"today",
-description:"Dont"}]
+description:"Dont"}];
 
 class App extends Component {
   render() {
@@ -45,6 +65,7 @@ class App extends Component {
       <header>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
       </header>
+
         <NAVBAR />
 
         {userPosts && <Posts items={userPosts} />}
@@ -57,7 +78,7 @@ class Posts extends Component {
   constructor(props) {
     super(props);
   }
-  Item () {
+  Item() {
     let items = [];
     for (var i = this.props.items.length - 1; i >= 0; i--) {
       items.push(
@@ -78,34 +99,79 @@ class Posts extends Component {
   }
 
   render() {
-    return(
+    return (
       <Grid>
-        <Row className="show-grid">
-          {this.Item()}
-        </Row>
+        <Row className="show-grid">{this.Item()}</Row>
       </Grid>
     );
   }
 }
 
 class NAVBAR extends Component {
- render(){
-   return(
-     <Navbar inverse fixedTop >
-       <Grid style={{color: "#fff"}}>
-         <Row className="show-grid">
-           <Col xs={4} sm={4} md={4}>
-             <Nav pullLeft>
-               <FontAwesomeIcon href="#brand" icon={faCamera} style={{"fontSize" : "20px", "textAlign" : "left"}} />
-             </Nav>
-           </Col>
-           <Col xs={4} sm={4} md={4}>
-             <p style={{"fontSize" : "20px"}}>InstaClone</p>
-           </Col>
-         </Row>
-       </Grid>
-     </Navbar>
-   );
+  render() {
+    return (
+      <Navbar inverse fixedTop collapseOnSelect>
+        <Grid style={{ color: "#fff" }}>
+          <Row className="show-grid">
+            <Col xs={6} sm={6} md={6} style={{ textAlign: "left" }}>
+              <Popup style={{"border":"none", "padding":"0px"}}
+                trigger={
+                  <FontAwesomeIcon
+                    href="#brand"
+                    id="basic-nav-dropdown"
+                    icon={faCamera}
+                    style={{ fontSize: "35px", marginTop: "15px" }}
+                  />
+                }
+                modal
+                closeOnDocumentClick
+              >
+
+                <form style={inputStyle}>
+                  <div class="row">
+                    <div class="col">
+                      <input
+                        type="text" style={inputStyle}
+                        className="form-control"
+                        placeholder="Image Url" autoFocus
+                      />
+                    </div>
+                    <div class="col">
+                      <input
+                        type="text" style={inputStyle}
+                        className="form-control"
+                        placeholder="Title"
+                      />
+                    </div>
+                    <div class="col">
+                      <textarea
+                        style={inputStyle}
+                        className="form-control"
+                        placeholder="Description"
+                      />
+                    </div>
+                    <div class="col">
+                      <button
+                        type="button" style={inputStyle}
+                        className="form-control btn-primary"
+                        onClick={userPosts[0].url = "https://images.unsplash.com/photo-1544475868-f60890b0bc6d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"}
+                      >Upload</button>
+                    </div>
+                  </div>
+                </form>
+              </Popup>
+            </Col>
+            <Col xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
+              <a href="#" style={{ color: "white", textDecoration: "none" }}>
+                <p style={{ fontSize: "30px", marginTop: "10px" }}>
+                  InstaClone
+                </p>
+              </a>
+            </Col>
+          </Row>
+        </Grid>
+      </Navbar>
+    );
   }
 }
 
