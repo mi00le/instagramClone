@@ -17,8 +17,6 @@ import { faCamera } from "@fortawesome/free-solid-svg-icons";
 
 import Popup from "reactjs-popup";
 
-
-
 const inputStyle = {
   width: "100%"
 };
@@ -59,16 +57,41 @@ createdAt:"today",
 description:"Dont"}];
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      posts: userPosts
+    };
+
+    this.updateInfo = this.updateInfo.bind(this);
+  }
+  updateInfo() {
+    let u = document.querySelector("#imgUrl");
+    let t = document.querySelector("#title");
+    let d = document.querySelector("#desc");
+    userPosts.push({
+      author: "kariez",
+      url: u.value,
+      title: t.value,
+      createdAt: "today",
+      description: d.value
+    });
+
+    this.setState({
+      posts: userPosts
+    });
+  }
+
   render() {
     return (
       <div style={{background: "#f7f7f7"}} className="App">
       <header>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
       </header>
+        <NAVBAR handler={this.updateInfo} />
 
-        <NAVBAR />
-
-        {userPosts && <Posts items={userPosts} />}
+        <Posts items={this.state.posts} />
       </div>
     );
   }
@@ -110,11 +133,12 @@ class Posts extends Component {
 class NAVBAR extends Component {
   render() {
     return (
-      <Navbar inverse fixedTop collapseOnSelect>
-        <Grid style={{ color: "#fff" }}>
+      <Navbar fixedTop collapseOnSelect style={{ backgroundColor: "#EDEDED" }}>
+        <Grid style={{ color: "#000" }}>
           <Row className="show-grid">
             <Col xs={6} sm={6} md={6} style={{ textAlign: "left" }}>
-              <Popup style={{"border":"none", "padding":"0px"}}
+              <Popup
+                style={{ border: "none", padding: "0px" }}
                 trigger={
                   <FontAwesomeIcon
                     href="#brand"
@@ -126,43 +150,51 @@ class NAVBAR extends Component {
                 modal
                 closeOnDocumentClick
               >
-
                 <form style={inputStyle}>
-                  <div class="row">
-                    <div class="col">
+                  <div className="row">
+                    <div className="col">
                       <input
-                        type="text" style={inputStyle}
+                        type="text"
+                        id="imgUrl"
+                        style={inputStyle}
                         className="form-control"
-                        placeholder="Image Url" autoFocus
+                        placeholder="Image Url"
+                        autoFocus
                       />
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <input
-                        type="text" style={inputStyle}
+                        type="text"
+                        style={inputStyle}
                         className="form-control"
+                        id="title"
                         placeholder="Title"
                       />
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <textarea
                         style={inputStyle}
                         className="form-control"
+                        id="desc"
                         placeholder="Description"
                       />
                     </div>
-                    <div class="col">
+                    <div className="col">
                       <button
-                        type="button" style={inputStyle}
+                        type="button"
+                        style={inputStyle}
                         className="form-control btn-primary"
-                        onClick={userPosts[0].url = "https://images.unsplash.com/photo-1544475868-f60890b0bc6d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"}
-                      >Upload</button>
+                        onClick={this.props.handler}
+                      >
+                        Upload
+                      </button>
                     </div>
                   </div>
                 </form>
               </Popup>
             </Col>
             <Col xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
-              <a href="#" style={{ color: "white", textDecoration: "none" }}>
+              <a href="#" style={{ color: "black", textDecoration: "none" }}>
                 <p style={{ fontSize: "30px", marginTop: "10px" }}>
                   InstaClone
                 </p>
