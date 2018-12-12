@@ -16,3 +16,9 @@ code {
 html{
 scroll-behavior : smooth;
 }
+
+.popup-content{
+border : none !important;
+padding :  0px !important;
+
+}

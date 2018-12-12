@@ -17,6 +17,12 @@ import { faCamera } from "@fortawesome/free-solid-svg-icons";
 
 import Popup from "reactjs-popup";
 
+
+
+const inputStyle = {
+  width: "100%"
+};
+
 const imgStyle = {
   width: "100%"
 };
@@ -113,34 +119,51 @@ class NAVBAR extends Component {
         <Grid style={{ color: "#fff" }}>
           <Row className="show-grid">
             <Col xs={6} sm={6} md={6} style={{ textAlign: "left" }}>
-              <Popup
+              <Popup style={{"border":"none", "padding":"0px"}}
                 trigger={
                   <FontAwesomeIcon
                     href="#brand"
                     id="basic-nav-dropdown"
                     icon={faCamera}
-                    style={{ fontSize: "30px", marginTop: "10px" }}
+                    style={{ fontSize: "35px", marginTop: "15px" }}
                   />
                 }
                 modal
-                closeOnDocumentClick>
-                <table>
-                  <tr>
-                    <td>
-                      <input type="text" placeholder="Image Url" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <input type="text" placeholder="Title" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <input type="text" placeholder="Description" />
-                    </td>
-                  </tr>
-                </table>
+                closeOnDocumentClick
+              >
+
+                <form style={inputStyle}>
+                  <div class="row">
+                    <div class="col">
+                      <input
+                        type="text" style={inputStyle}
+                        className="form-control"
+                        placeholder="Image Url" autoFocus
+                      />
+                    </div>
+                    <div class="col">
+                      <input
+                        type="text" style={inputStyle}
+                        className="form-control"
+                        placeholder="Title"
+                      />
+                    </div>
+                    <div class="col">
+                      <textarea
+                        style={inputStyle}
+                        className="form-control"
+                        placeholder="Description"
+                      />
+                    </div>
+                    <div class="col">
+                      <button
+                        type="button" style={inputStyle}
+                        className="form-control btn-primary"
+                        onClick={userPosts[0].url = "https://images.unsplash.com/photo-1544475868-f60890b0bc6d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"}
+                      >Upload</button>
+                    </div>
+                  </div>
+                </form>
               </Popup>
             </Col>
             <Col xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
