@@ -1,0 +1,60 @@
+.navbar-main{
+
+	background-color: #EDEDED !important;
+}
+.grid{
+	color : #000;
+}
+.col-left{
+	text-align: left;
+}
+.w3-animate-top{
+animation-duration: 0.8s !important;
+}
+
+.popup{
+	border : none;
+	padding: 0px;
+	border-radius: 20px;
+}
+.camera-icon{
+	font-size: 35px;
+	margin-top: 15px; 
+}
+.form-style{
+	margin: 50px;
+}
+.input-style{
+	
+  	width: 100%;
+  	text-align : center;
+
+}
+.col-right{
+	text-align: right;
+}
+a.insta-clone{
+	text-decoration: none;
+}
+p.insta-clone{
+	font-size: 35px;
+	margin-top: 8px;
+	float: right;
+	color: black;
+	font-family: 'Lobster', cursive;
+}
+.popup-content{
+border : none !important;
+padding :  0px !important;
+width : 20% !important;
+min-width : 300px !important;
+border-radius:10px !important;
+background-color : #e7e7e7 !important;
+}
+.btn-primary {
+height : 50px !important;
+
+}
+#desc{
+resize : none;
+}

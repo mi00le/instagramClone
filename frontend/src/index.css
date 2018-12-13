@@ -16,27 +16,9 @@ code {
     monospace;
 }
 
-
-.popup-content{
-border : none !important;
-padding :  0px !important;
-width : 20% !important;
-min-width : 300px !important;
-border-radius:10px !important;
-background-color : #e7e7e7 !important;
-}
-#desc{
-resize : none;
-}
 .modal-body{
 padding-bottom : 0px !important;
 padding-top : 0px !important;
 }
-.btn-primary {
-height : 50px !important;
 
-}
 
-.w3-animate-top{
-animation-duration: 0.8s !important;
-}

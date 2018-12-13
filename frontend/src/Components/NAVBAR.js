@@ -1,52 +1,39 @@
-import React from 'react';
-
+import React from "react";
+import "../navbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 
 import Popup from "reactjs-popup";
 
-import {
-  Grid,
-  Row,
-  Col,
-  Navbar
-} from "react-bootstrap";
+import { Grid, Row, Col, Navbar } from "react-bootstrap";
 
-const inputStyle = {
-  width: "100%",
-  textAlign : "center"
-
-};
-
-export default class NAVBAR extends React.Component{
-
-render() {
+export default class NAVBAR extends React.Component {
+  render() {
     return (
-      <Navbar fixedTop collapseOnSelect style={{ backgroundColor: "#EDEDED" }}>
-        <Grid style={{ color: "#000" }}>
+      <Navbar fixedTop collapseOnSelect className="navbar-main">
+        <Grid className="grid">
           <Row className="show-grid">
-            <Col xs={6} sm={6} md={6} style={{ textAlign: "left" }}>
-              <Popup className="w3-animate-top"
-                style={{ border: "none", padding: "0px", borderRadius : "20px" }}
+            <Col xs={6} sm={6} md={6} className="col-left">
+              <Popup
+                className="w3-animate-top popup"
                 trigger={
                   <FontAwesomeIcon
                     href="#brand"
                     id="basic-nav-dropdown"
                     icon={faCamera}
-                    style={{ fontSize: "35px", marginTop: "15px" }}
+                    className="camera-icon"
                   />
                 }
                 modal
                 closeOnDocumentClick
               >
-                <form style={{margin:"50px"}}>
+                <form className="form-style">
                   <div className="row">
                     <div className="col">
                       <input
                         type="text"
                         id="imgUrl"
-                        style={inputStyle}
-                        className="form-control"
+                        className="form-control input-style"
                         placeholder="Image Url"
                         autoFocus
                         required
@@ -55,8 +42,7 @@ render() {
                     <div className="col">
                       <input
                         type="text"
-                        style={inputStyle}
-                        className="form-control"
+                        className="form-control input-style"
                         id="title"
                         placeholder="Title"
                         required
@@ -65,8 +51,7 @@ render() {
                     <div className="col">
                       <input
                         type="text"
-                        style={inputStyle}
-                        className="form-control"
+                        className="form-control input-style"
                         id="tags"
                         placeholder="Tags"
                         required
@@ -74,8 +59,7 @@ render() {
                     </div>
                     <div className="col">
                       <textarea
-                        style={inputStyle}
-                        className="form-control"
+                        className="form-control input-style"
                         id="desc"
                         placeholder="Description"
                         required
@@ -85,8 +69,7 @@ render() {
                       <button
                         type="button"
                         id="btn"
-                        style={inputStyle}
-                        className="form-control btn-primary"
+                        className="form-control btn-primary input-style"
                         onClick={this.props.handler}
                       >
                         Upload
@@ -96,11 +79,9 @@ render() {
                 </form>
               </Popup>
             </Col>
-            <Col xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
-              <a href="#top" style={{ color: "black", textDecoration: "none" }}>
-                <p style={{ fontSize: "30px", marginTop: "10px", float : "right" }}>
-                  InstaClone
-                </p>
+            <Col xs={6} sm={6} md={6} className="col-right">
+              <a href="#top" className="insta-clone">
+                <p className="insta-clone">InstaClone</p>
               </a>
             </Col>
           </Row>
@@ -108,4 +89,4 @@ render() {
       </Navbar>
     );
   }
-};
+}

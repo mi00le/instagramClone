@@ -1,15 +1,10 @@
 import React, { Component } from "react";
 import "./App.css";
-import {
-  Grid,
-  Row,
-  Col,
-} from "react-bootstrap";
+import { Grid, Row, Col } from "react-bootstrap";
 
-import NAVBAR from './Components/NAVBAR.js';
+import NAVBAR from "./Components/NAVBAR.js";
 
 let date = new Date().toLocaleString();
-
 
 const imgStyle = {
   width: "100%"
@@ -72,7 +67,6 @@ class App extends Component {
     let t = document.querySelector("#title");
     let d = document.querySelector("#desc");
 
-
     if (
       u.value.match(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)$/) != null
     ) {
@@ -94,7 +88,7 @@ class App extends Component {
 
   render() {
     return (
-      <div  className="App">
+      <div className="App">
         <header>
           <link
             rel="stylesheet"
@@ -107,7 +101,14 @@ class App extends Component {
             integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
             crossOrigin="anonymous"
           />
-          <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
+          <link
+            href="https://fonts.googleapis.com/css?family=Lobster"
+            rel="stylesheet"
+          />
+          <link
+            rel="stylesheet"
+            href="https://www.w3schools.com/w3css/4/w3.css"
+          />
         </header>
         <NAVBAR handler={this.updateInfo} />
         <Posts items={this.state.posts} />
@@ -164,8 +165,5 @@ class Posts extends Component {
     );
   }
 }
-
-
-
 
 export default App;
