@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import qs from "qs";
 import "./App.css";
 import {
   Button,
@@ -41,29 +42,15 @@ let gridText = {
   margin: 10,
 }
 
-let userPosts = [{author: "nan",
-url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
-title:"My First Post",
-createdAt:"Today",
-description:"REEEEEEEEEEEEEEEEEEEEEEEEEEE SPAM SPAM SPAM SPAM SPAM SPAM SPAM SPAM margin: 10 margin: 10margin: 10margin: 10margin: 10margin: 10margin: 10margin: 10margin: 10margin: 10"},
-{author: "Wibly2",
-url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
-title:"My second Post",
-createdAt:"Yesterday",
-description:"This was my second post"},
-{author: "kariez",
-url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
-title:"My worst Post",
-createdAt:"today",
-description:"Dont"}];
-
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      posts: userPosts
+      posts: {}
     };
+
+    this.RefreshSite();
 
     this.updateInfo = this.updateInfo.bind(this);
   }
@@ -71,20 +58,24 @@ class App extends Component {
     let u = document.querySelector("#imgUrl");
     let t = document.querySelector("#title");
     let d = document.querySelector("#desc");
-    userPosts.push({
-      author: "kariez",
-      url: u.value,
-      title: t.value,
-      createdAt: "today",
-      description: d.value
-    });
 
-    axios.post("localhost:1337/posts/1", {data:{image: u.value, title: t.value, description: d.value}});
+    axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: {}}))
+    .then(function(response){console.log(response.data)});
 
-    this.setState({
-      posts: userPosts
-    });
+    this.RefreshSite();
+
   }
+  RefreshSite() {
+
+    axios.get("http://localhost:3002/posts")
+    .then(function(response){
+      this.setState({
+        posts: response.data.posts
+      });
+    }.bind(this));
+
+  }
+
 
   render() {
     return (
@@ -105,8 +96,9 @@ class Posts extends Component {
     super(props);
   }
   Item() {
+    console.log(this.props.items);
     let items = [];
-    for (var i = this.props.items.length - 1; i >= 0; i--) {
+    for (var i = 0; i < this.props.items.length; i++) {
       items.push(
         <Col sm={12} md={8} style={gridItem}>
           <h3 style={gridText}>{this.props.items[i].title}</h3>
@@ -116,8 +108,8 @@ class Posts extends Component {
           </div>
           <hr style={{margin: 0}}/>
           <div style={{width: "70%", margin: "0 auto"}}>
-            <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a href="#">{this.props.items[i].author}</a></p>
-            <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{this.props.items[i].createdAt}</p>
+            <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a href="#">{this.props.items[i].username}</a></p>
+            <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{new Date(this.props.items[i].createdAt).toDateString()}</p>
           </div>
         </Col>);
     }
