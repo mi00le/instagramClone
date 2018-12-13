@@ -34,7 +34,7 @@ app.route("/users/auth").post((req, res) => {
 			res.json(result ? {success: result} : {success: result, err});
 		});
 	} else {
-		res.json({success: false}, error: {message: "Invalid request, missing email or password", id: "missingParams"});
+		res.json({success: false, error: {message: "Invalid request, missing email or password", id: "missingParams"}});
 	}
 });
 
