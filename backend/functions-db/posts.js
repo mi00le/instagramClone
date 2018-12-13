@@ -1,7 +1,7 @@
 var sql = require('./db-init.js');
 var db = sql.getDb();
 
-exports.createPost = (image, title, description, tags, userId, callback) => {
+exports.createPost = (image, title, description, tags, userName, userId, callback) => {
     if (!userId) {
         if (callback && callback instanceof Function) callback(false);
         return;
@@ -14,9 +14,8 @@ exports.createPost = (image, title, description, tags, userId, callback) => {
     description = description ? description : "";
     tags = tags ? tags : "";
 
-
-    db.run("INSERT INTO Posts(AuthorID, Url, CreatedAt, Title, Description, Tags) VALUES(?, ?, ?, ?, ?, ?)", {
-        1: userId, 2: url, 3: new Date().getTime(), 4: title, 5: description, 6: ((tags instanceof String) ? tags : JSON.stringify(tags))
+    db.run("INSERT INTO Posts(AuthorID, AuthorName, Url, CreatedAt, Title, Description, Tags) VALUES(?, ?, ?, ?, ?, ?, ?)", {
+        1: userId, 2: userName, 3: url, 4: new Date().getTime(), 5: title, 6: description, 7: ((tags instanceof String) ? tags : JSON.stringify(tags))
     }, (err) => {
         if (callback && callback instanceof Function) callback(!(err));
     });
@@ -30,6 +29,7 @@ exports.getPost = (postId, callback) => {
             if (callback && callback instanceof Function) callback(true, {
                 id: row.ID,
                 userId: row.AuthorID,
+                username: row.AuthorName,
                 url: row.Url,
                 createdAt: row.CreatedAt,
                 title: row.Title,
@@ -42,6 +42,33 @@ exports.getPost = (postId, callback) => {
     })
 };
 
+exports.getAllPosts = (limit, callback) => {
+    db.all("SELECT * FROM Posts", (err, rows) => {
+        if (err) console.log(err.message);
+        if (rows) {
+            var result = [];
+            for (var i = rows.length - 1; i >= 0; i--) {
+                if (limit && limit > 0)
+                    if (result.length >= limit)
+                        break;
+                var obj = rows[i];
+                result.push({
+                    id: obj.ID,
+                    userId: obj.AuthorID,
+                    username: obj.AuthorName,
+                    url: obj.Url,
+                    createdAt: obj.CreatedAt,
+                    title: obj.Title,
+                    description: obj.Description,
+                    tags: obj.Tags
+                });
+
+            }
+            if (callback && callback instanceof Function) callback(true, result);
+        } else if (callback && callback instanceof Function) callback(false);
+    });
+};
+
 exports.getAllPostsFromUser = (userId, callback) => {
     db.all("SELECT * FROM Posts WHERE AuthorID=?", userId, (err, rows) => {
         if (err) console.log(err.message);
@@ -51,6 +78,7 @@ exports.getAllPostsFromUser = (userId, callback) => {
                 result.push({
                     id: obj.ID,
                     userId: obj.AuthorID,
+                    username: obj.AuthorName,
                     url: obj.Url,
                     createdAt: obj.CreatedAt,
                     title: obj.Title,
