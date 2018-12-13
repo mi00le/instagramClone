@@ -18,8 +18,11 @@ animation-duration: 0.8s !important;
 	border-radius: 20px;
 }
 .camera-icon{
-	font-size: 35px;
+	font-size: 40px;
 	margin-top: 15px; 
+	color : #777;
+	filter: drop-shadow( 1px 1px 1px #000 );
+
 }
 .form-style{
 	margin: 50px;
@@ -37,11 +40,12 @@ a.insta-clone{
 	text-decoration: none;
 }
 p.insta-clone{
-	font-size: 35px;
-	margin-top: 8px;
+	font-size: 40px;
+	margin-top: 5px;
 	float: right;
-	color: black;
+	color: #777;
 	font-family: 'Lobster', cursive;
+	text-shadow: 1px 1px 2px black;
 }
 .popup-content{
 border : none !important;
