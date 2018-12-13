@@ -4,7 +4,8 @@
   "description": "Insta clone backend side",
   "main": "server.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "start": "node server.js"
   },
   "keywords": [
     "instagram",

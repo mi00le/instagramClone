@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 import "./App.css";
 import {
   Button,
@@ -26,7 +27,7 @@ const imgStyle = {
 };
 
 let gridItem = {
-  margin : "60px auto",
+  margin : "50px auto",
   float: "none",
   borderStyle: "solid",
   borderColor: "#e6e6e6",
@@ -34,7 +35,7 @@ let gridItem = {
   borderRadius: 3,
   padding: "0",
   background: "#fff",
-  
+
 };
 let gridText = {
   margin: 10,
@@ -77,6 +78,8 @@ class App extends Component {
       createdAt: "today",
       description: d.value
     });
+
+    axios.post("localhost:1337/posts/1", {data:{image: u.value, title: t.value, description: d.value}});
 
     this.setState({
       posts: userPosts
