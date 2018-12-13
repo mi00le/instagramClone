@@ -8,7 +8,7 @@ exports.createPost = (image, title, description, tags, userName, userId, callbac
     }
 
     // upload image somehow
-    var url = (typeof(image) === "string") ? image : "testStringPlsFix";
+    const url = typeof(image) === "string" ? image : "testStringPlsFix";
 
     title = title ? title : "";
     description = description ? description : "";
