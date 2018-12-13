@@ -7,7 +7,7 @@ var dbPosts = require('./functions-db/posts.js');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 3002;
 
 app.route("/users").get((req, res) => {
 	dbUsers.getAllUsers((result, users) => {
