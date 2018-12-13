@@ -33,7 +33,7 @@ exports.authenticateUser = (email, password, callback) => {
                 console.log("Log in");
 
                 if (callback && callback instanceof Function) callback(true);
-            }
+            } else if (callback && callback instanceof Function) callback(false);
         } else {
             var pass = encryptPass(password); // spoof hashing time even if no user was found
             console.log("No results");
