@@ -2,7 +2,7 @@ var sql = require('./db-init.js');
 var db = sql.getDb();
 
 exports.createPost = (image, title, description, tags, userName, userId, callback) => {
-    if (!userId) {
+    if (!userId || !userName) {
         if (callback && callback instanceof Function) callback(false);
         return;
     }
@@ -72,7 +72,7 @@ exports.getAllPosts = (limit, callback) => {
 exports.getAllPostsFromUser = (userId, callback) => {
     db.all("SELECT * FROM Posts WHERE AuthorID=?", userId, (err, rows) => {
         if (err) console.log(err.message);
-        if (rows.length > 0) {
+        if (rows) {
             var result = [];
             for (var obj of rows) {
                 result.push({
@@ -87,8 +87,7 @@ exports.getAllPostsFromUser = (userId, callback) => {
                 });
             }
             if (callback && callback instanceof Function) callback(true, result);
-        }
-        if (callback && callback instanceof Function) callback(false);
+        } else if (callback && callback instanceof Function) callback(false);
     });
 };
 
