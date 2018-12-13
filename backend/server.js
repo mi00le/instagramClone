@@ -22,28 +22,28 @@ app.route("/users").get((req, res) => {
 	});
 }).post((req, res) => {
 	if (req.body.email && req.body.password && req.body.displayName) {
-		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, (result) => {
-			res.json({success: result});
+		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, (result, err) => {
+			res.json(result ? {success: result} : {success: result, err});
 		});
-	} else res.json({success: false});
+	} else res.json({success: false, error: {message: "Invalid request, missing email, password, or displayName", id: "missingParams"}});
 });
 
 app.route("/users/auth").post((req, res) => {
 	if (req.body.email && req.body.password) {
-		dbUsers.authenticateUser(req.body.email, req.body.password, (result) => {
-			res.json({ success: result });
+		dbUsers.authenticateUser(req.body.email, req.body.password, (result, err) => {
+			res.json(result ? {success: result} : {success: result, err});
 		});
 	} else {
-		res.json({ success: false });
+		res.json({success: false}, error: {message: "Invalid request, missing email or password", id: "missingParams"});
 	}
 });
 
 app.route("/users/:userId").get((req, res) => {
-	dbUsers.getUser(req.params.userId, (result, user) => {
+	dbUsers.getUser(req.params.userId, (result, user, err) => {
 		if (result && !!(user)) {
 			res.json({success: true, user: user});
 		} else {
-			res.json({success: false});
+			res.json({success: false, error: err});
 		}
 	})
 }).delete((req, res) => {
@@ -68,7 +68,7 @@ app.route("/posts/:userId").get((req, res) => {
 	});
 }).post((req, res) => {
 	dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId, (result) => {
-		res.json({success: result});
+		res.json(result);
 	});
 });
 
