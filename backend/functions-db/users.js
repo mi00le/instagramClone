@@ -33,12 +33,12 @@ exports.authenticateUser = (email, password, callback) => {
                 console.log("Log in");
 
                 if (callback && callback instanceof Function) callback(true);
-            } else if (callback && callback instanceof Function) callback(false);
+            } else if (callback && callback instanceof Function) callback(false, {message: "Invalid auth", id: "badAuth"});
         } else {
             var pass = encryptPass(password); // spoof hashing time even if no user was found
             console.log("No results");
 
-            if (callback && callback instanceof Function) callback(false);
+            if (callback && callback instanceof Function) callback(false, {message: "Invalid auth", id: "badAuth"});
         }
 
     });
@@ -53,7 +53,7 @@ exports.getUser = (userId, callback) => {
                 displayName: row.displayName,
                 id: row.ID
             });
-        } else if (callback && callback instanceof Function) callback(false);
+        } else if (callback && callback instanceof Function) callback(false, {}, {message: "No user found with id", id: "notFound"});
     })
 };
 
@@ -61,7 +61,7 @@ exports.getAllUsers = (callback) => {
     db.all("SELECT * FROM Users", (err, rows) => {
         if (err) console.log(err.message);
 
-        if (rows.length > 0) {
+        if (rows) {
             var result = [];
             for (var obj of rows) {
                 result.push({
@@ -81,7 +81,13 @@ exports.createUser = (email, password, displayName, callback) => {
 
     db.get("SELECT * FROM Users WHERE Email=? OR DisplayName=?", {1: email, 2: displayName}, (err, row) => {
         if (row) {
-            if (callback && callback instanceof Function) callback(false);
+            if (row.Email === email) {
+                if (callback && callback instanceof Function) callback(false, {message: "Email taken", id: "inUseEmail"});
+            } else if (row.DisplayName === displayName) {
+                if (callback && callback instanceof Function) callback(false, {message: "Name taken", id: "inUseName"});
+            } else {
+                if (callback && callback instanceof Function) callback(false, {message: "Unknown error", id: "unknownError"});
+            }
         } else if (err) {
             console.log(err.message);
             if (callback && callback instanceof Function) callback(false);
@@ -101,6 +107,7 @@ exports.deleteUser = (userId, callback) => {
 
     db.run("DELETE FROM Posts WHERE AuthorID=?", userId, (err) => {
         if (err) {
+            console.log(err);
             if (callback && callback instanceof Function) callback(false);
         } else {
             db.run("DELETE FROM Users WHERE ID=?", userId, (err) => {

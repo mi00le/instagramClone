@@ -8,7 +8,7 @@ exports.createPost = (image, title, description, tags, userName, userId, callbac
     }
 
     // upload image somehow
-    var url = "debug";
+    var url = (image instanceof String) ? image : "testStringPlsFix";
 
     title = title ? title : "";
     description = description ? description : "";
@@ -17,6 +17,7 @@ exports.createPost = (image, title, description, tags, userName, userId, callbac
     db.run("INSERT INTO Posts(AuthorID, AuthorName, Url, CreatedAt, Title, Description, Tags) VALUES(?, ?, ?, ?, ?, ?, ?)", {
         1: userId, 2: userName, 3: url, 4: new Date().getTime(), 5: title, 6: description, 7: ((tags instanceof String) ? tags : JSON.stringify(tags))
     }, (err) => {
+        console.log(err.message);
         if (callback && callback instanceof Function) callback(!(err));
     });
 };
