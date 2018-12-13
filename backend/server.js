@@ -93,7 +93,7 @@ app.route("/posts/:userId/:postId").get((req, res) => {
 
 app.use((req, res) => {
 	res.status(404).send(req.originalUrl + " not found");
-})
+});
 
 app.listen(port, () => {
 	console.log("Node listening on port " + port + "...");
