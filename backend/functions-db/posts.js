@@ -75,7 +75,8 @@ exports.getAllPostsFromUser = (userId, callback) => {
         if (err) console.log(err.message);
         if (rows) {
             var result = [];
-            for (var obj of rows) {
+            for (var i = rows.length - 1; i >= 0; i--) {
+                var obj = rows[i];
                 result.push({
                     id: obj.ID,
                     userId: obj.AuthorID,
