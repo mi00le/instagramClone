@@ -21,8 +21,8 @@ var encryptPass = (password, salt) => {
     };
 }
 
-exports.logIn = (email, password, callback) => {
-    console.log("Attempt login");
+exports.authenticateUser = (email, password, callback) => {
+    console.log("Attempt auth");
 
     db.get("SELECT * FROM Users WHERE Email=?", {1: email}, (err, row) => {
         if (err) console.log(err.message);
@@ -31,21 +31,48 @@ exports.logIn = (email, password, callback) => {
             if (row.Password === pass.hash) {
                 // log user in
                 console.log("Log in");
+
+                if (callback && callback instanceof Function) callback(true);
             }
         } else {
             var pass = encryptPass(password); // spoof hashing time even if no user was found
             console.log("No results");
+
+            if (callback && callback instanceof Function) callback(false);
         }
 
-        if (callback && callback instanceof Function) callback(!(err) && !!(row));
     });
-
 };
 
-exports.logOut = (token, callback) => {
-    console.log("Attempt logout");
+exports.getUser = (userId, callback) => {
+    db.get("SELECT * FROM Users WHERE ID=?", userId, (err, row) => {
+        if (err) console.log(err.message);
+        if (row) {
+            if (callback && callback instanceof Function) callback(true, {
+                email: row.Email,
+                displayName: row.displayName,
+                id: row.ID
+            });
+        } else if (callback && callback instanceof Function) callback(false);
+    })
+};
 
-    if (callback && callback instanceof Function) callback(true);
+exports.getAllUsers = (callback) => {
+    db.all("SELECT * FROM Users", (err, rows) => {
+        if (err) console.log(err.message);
+
+        if (rows.length > 0) {
+            var result = [];
+            for (var obj of rows) {
+                result.push({
+                    email: obj.Email,
+                    displayName: obj.Password,
+                    id: obj.ID
+                })
+            }
+            if (callback && callback instanceof Function) callback(true, result); 
+        } else if (callback && callback instanceof Function) callback(false);
+    });
 };
 
 exports.createUser = (email, password, displayName, callback) => {
