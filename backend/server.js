@@ -5,7 +5,10 @@ var bodyParser = require('body-parser');
 var dbUsers = require('./functions-db/users.js');
 var dbPosts = require('./functions-db/posts.js');
 
+var cors = require('cors');
+
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors());
 
 var port = process.env.PORT || 3000;
 
@@ -93,7 +96,7 @@ app.route("/posts/:userId/:postId").get((req, res) => {
 
 app.use((req, res) => {
 	res.status(404).send(req.originalUrl + " not found");
-})
+});
 
 app.listen(port, () => {
 	console.log("Node listening on port " + port + "...");
