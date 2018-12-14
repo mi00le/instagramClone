@@ -27,7 +27,7 @@ const imgStyle = {
   width: "100%"
 };
 
-let gridItem = {
+const gridItem = {
   margin : "50px auto",
   float: "none",
   borderStyle: "solid",
@@ -36,9 +36,8 @@ let gridItem = {
   borderRadius: 3,
   padding: "0",
   background: "#fff",
-
 };
-let gridText = {
+const gridText = {
   margin: 10,
 }
 
@@ -47,12 +46,13 @@ class App extends Component {
     super(props);
 
     this.state = {
-      posts: {}
+      posts: []
     };
 
-    this.RefreshSite();
+    this.refreshPosts();
 
     this.updateInfo = this.updateInfo.bind(this);
+    this.refreshPosts = this.refreshPosts.bind(this);
   }
   updateInfo() {
     let u = document.querySelector("#imgUrl");
@@ -60,20 +60,21 @@ class App extends Component {
     let d = document.querySelector("#desc");
 
     axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: {}}))
-    .then(function(response){console.log(response.data)});
-
-    this.RefreshSite();
-
+    .then((res) => {
+      if (res.data.post) {
+        this.setState({posts: [res.data.post, ...this.state.posts]});
+      } else {
+        this.refreshPosts();
+      }
+    });
   }
-  RefreshSite() {
-
+  refreshPosts() {
     axios.get("http://localhost:3002/posts")
-    .then(function(response){
+    .then((response) => {
       this.setState({
         posts: response.data.posts
       });
-    }.bind(this));
-
+    });
   }
 
 
@@ -96,7 +97,6 @@ class Posts extends Component {
     super(props);
   }
   Item() {
-    console.log(this.props.items);
     let items = [];
     for (var i = 0; i < this.props.items.length; i++) {
       items.push(
