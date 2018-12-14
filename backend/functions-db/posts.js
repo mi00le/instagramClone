@@ -14,11 +14,22 @@ exports.createPost = (image, title, description, tags, userName, userId, callbac
     description = description ? description : "";
     tags = tags ? tags : "";
 
+    var currentTime = new Date().getTime();
+
     db.run("INSERT INTO Posts(AuthorID, AuthorName, Url, CreatedAt, Title, Description, Tags) VALUES(?, ?, ?, ?, ?, ?, ?)", {
-        1: userId, 2: userName, 3: url, 4: new Date().getTime(), 5: title, 6: description, 7: ((tags instanceof String) ? tags : JSON.stringify(tags))
+        1: userId, 2: userName, 3: url, 4: currentTime, 5: title, 6: description, 7: ((tags instanceof String) ? tags : JSON.stringify(tags))
     }, (err) => {
         console.log(err.message);
-        if (callback && callback instanceof Function) callback(!(err));
+        if (callback && callback instanceof Function) callback(!(err), {
+            id: this.lastID,
+            userId: userId,
+            username: userName,
+            url: url,
+            createdAt: currentTime,
+            title: title,
+            description: description,
+            tags: ((tags instanceof String) ? tags : JSON.stringify(tags))
+        });
     });
 };
 
