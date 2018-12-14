@@ -67,8 +67,8 @@ app.route("/posts/:userId").get((req, res) => {
 		} else res.json({success: false});
 	});
 }).post((req, res) => {
-	dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId, (result) => {
-		res.json(result);
+	dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId, (result, post) => {
+		res.json({success: result, post: result ? post : null});
 	});
 });
 
