@@ -10,7 +10,7 @@ var cors = require('cors');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 3002;
 
 app.route("/users").get((req, res) => {
 	dbUsers.getAllUsers((result, users) => {

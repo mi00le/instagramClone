@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import axios from "axios";
+import qs from "qs";
 import "./App.css";
 import {
   Button,
@@ -25,8 +27,8 @@ const imgStyle = {
   width: "100%"
 };
 
-let gridItem = {
-  margin : "60px auto",
+const gridItem = {
+  margin : "50px auto",
   float: "none",
   borderStyle: "solid",
   borderColor: "#e6e6e6",
@@ -34,54 +36,47 @@ let gridItem = {
   borderRadius: 3,
   padding: "0",
   background: "#fff",
-  
 };
-let gridText = {
+const gridText = {
   margin: 10,
 }
-
-let userPosts = [{author: "nan",
-url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
-title:"My First Post",
-createdAt:"Today",
-description:"REEEEEEEEEEEEEEEEEEEEEEEEEEE SPAM SPAM SPAM SPAM SPAM SPAM SPAM SPAM margin: 10 margin: 10margin: 10margin: 10margin: 10margin: 10margin: 10margin: 10margin: 10margin: 10"},
-{author: "Wibly2",
-url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
-title:"My second Post",
-createdAt:"Yesterday",
-description:"This was my second post"},
-{author: "kariez",
-url: "https://www.gettyimages.fi/gi-resources/images/CreativeLandingPage/HP_Sept_24_2018/CR3_GettyImages-159018836.jpg",
-title:"My worst Post",
-createdAt:"today",
-description:"Dont"}];
 
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      posts: userPosts
+      posts: []
     };
 
+    this.refreshPosts();
+
     this.updateInfo = this.updateInfo.bind(this);
+    this.refreshPosts = this.refreshPosts.bind(this);
   }
   updateInfo() {
     let u = document.querySelector("#imgUrl");
     let t = document.querySelector("#title");
     let d = document.querySelector("#desc");
-    userPosts.push({
-      author: "kariez",
-      url: u.value,
-      title: t.value,
-      createdAt: "today",
-      description: d.value
-    });
 
-    this.setState({
-      posts: userPosts
+    axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: {}}))
+    .then((res) => {
+      if (res.data.post) {
+        this.setState({posts: [res.data.post, ...this.state.posts]});
+      } else {
+        this.refreshPosts();
+      }
     });
   }
+  refreshPosts() {
+    axios.get("http://localhost:3002/posts")
+    .then((response) => {
+      this.setState({
+        posts: response.data.posts
+      });
+    });
+  }
+
 
   render() {
     return (
@@ -101,32 +96,33 @@ class Posts extends Component {
   constructor(props) {
     super(props);
   }
-  Item() {
-    let items = [];
-    for (var i = this.props.items.length - 1; i >= 0; i--) {
-      items.push(
-        <Col sm={12} md={8} style={gridItem}>
-          <h3 style={gridText}>{this.props.items[i].title}</h3>
-          <img style={imgStyle} src={this.props.items[i].url} />
-          <div style={{width: "70%", margin: "0 auto"}}>
-          <p style={{margin: 10}}>{this.props.items[i].description}</p>
-          </div>
-          <hr style={{margin: 0}}/>
-          <div style={{width: "70%", margin: "0 auto"}}>
-            <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a href="#">{this.props.items[i].author}</a></p>
-            <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{this.props.items[i].createdAt}</p>
-          </div>
-        </Col>);
-    }
-    return items;
-  }
 
   render() {
     return (
       <Grid>
-        <Row className="show-grid">{this.Item()}</Row>
+        <Row className="show-grid">
+          {this.props.items.map(post => <Post title={post.title} imgUrl={post.url} description={post.description} username={post.username} createdAt={post.createdAt} />)}
+        </Row>
       </Grid>
     );
+  }
+}
+
+class Post extends Component {
+  render() {
+    return (
+      <Col sm={12} md={8} style={gridItem}>
+        <h3 style={gridText}>{this.props.title}</h3>
+        <img style={imgStyle} src={this.props.imgUrl} />
+        <div style={{width: "70%", margin: "0 auto"}}>
+        <p style={{margin: 10}}>{this.props.description}</p>
+        </div>
+        <hr style={{margin: 0}}/>
+        <div style={{width: "70%", margin: "0 auto"}}>
+          <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a href="#">{this.props.username}</a></p>
+          <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{new Date(this.props.createdAt).toDateString()}</p>
+        </div>
+      </Col>);
   }
 }
 
