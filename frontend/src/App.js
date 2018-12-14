@@ -96,32 +96,33 @@ class Posts extends Component {
   constructor(props) {
     super(props);
   }
-  Item() {
-    let items = [];
-    for (var i = 0; i < this.props.items.length; i++) {
-      items.push(
-        <Col sm={12} md={8} style={gridItem}>
-          <h3 style={gridText}>{this.props.items[i].title}</h3>
-          <img style={imgStyle} src={this.props.items[i].url} />
-          <div style={{width: "70%", margin: "0 auto"}}>
-          <p style={{margin: 10}}>{this.props.items[i].description}</p>
-          </div>
-          <hr style={{margin: 0}}/>
-          <div style={{width: "70%", margin: "0 auto"}}>
-            <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a href="#">{this.props.items[i].username}</a></p>
-            <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{new Date(this.props.items[i].createdAt).toDateString()}</p>
-          </div>
-        </Col>);
-    }
-    return items;
-  }
 
   render() {
     return (
       <Grid>
-        <Row className="show-grid">{this.Item()}</Row>
+        <Row className="show-grid">
+          {this.props.items.map(post => <Post title={post.title} imgUrl={post.url} description={post.description} username={post.username} createdAt={post.createdAt} />)}
+        </Row>
       </Grid>
     );
+  }
+}
+
+class Post extends Component {
+  render() {
+    return (
+      <Col sm={12} md={8} style={gridItem}>
+        <h3 style={gridText}>{this.props.title}</h3>
+        <img style={imgStyle} src={this.props.imgUrl} />
+        <div style={{width: "70%", margin: "0 auto"}}>
+        <p style={{margin: 10}}>{this.props.description}</p>
+        </div>
+        <hr style={{margin: 0}}/>
+        <div style={{width: "70%", margin: "0 auto"}}>
+          <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a href="#">{this.props.username}</a></p>
+          <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{new Date(this.props.createdAt).toDateString()}</p>
+        </div>
+      </Col>);
   }
 }
 
