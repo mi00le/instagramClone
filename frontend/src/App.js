@@ -40,19 +40,40 @@ const gridItem = {
 const gridText = {
   margin: 10,
 }
+const loginBox = {
+  margin : "80px auto",
+  float: "none",
+  borderStyle: "solid",
+  borderColor: "#e6e6e6",
+  borderWidth: 1,
+  borderRadius: 3,
+  padding: "0",
+  background: "#fff",
+}
+const loginInput = {
+  width: "80%",
+  height: 30,
+  margin: "12px auto",
+  padding: 2,
+  display: "block",
+  borderRadius: 3,
+  borderWidth: 1,
+  borderColor: "#e6e6e6",
+}
 
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      posts: []
+      posts: [],
+      username: sessionStorage.getItem("username"),
     };
-
     this.refreshPosts();
 
     this.updateInfo = this.updateInfo.bind(this);
     this.refreshPosts = this.refreshPosts.bind(this);
+    this.login = this.login.bind(this);
   }
   updateInfo() {
     let u = document.querySelector("#imgUrl");
@@ -77,6 +98,13 @@ class App extends Component {
     });
   }
 
+  login(email, username) {
+    this.setState({
+      username: email,
+    });
+    sessionStorage.setItem("username", email)
+  }
+
 
   render() {
     return (
@@ -86,8 +114,91 @@ class App extends Component {
       </header>
         <NAVBAR handler={this.updateInfo} />
 
-        <Posts items={this.state.posts} />
+        {this.state.username ? <Posts items={this.state.posts} /> : <Login sucessFunction={this.login} /> }
       </div>
+    );
+  }
+}
+
+class Login extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      register: false,
+      errorMsg: ""
+    };
+
+    this.swapSetting = this.swapSetting.bind(this);
+    this.loginHandler = this.loginHandler.bind(this);
+    this.register = this.register.bind(this);
+  }
+
+  swapSetting(){
+    this.setState({
+      register: !this.state.register,
+      errorMsg: ""
+    });
+  }
+
+  loginHandler(){
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value
+    axios.post("http://localhost:3002/users/auth", qs.stringify({email: email,password: password}))
+    .then((res) => {
+      if (res.data.success) {
+        this.props.sucessFunction(email);
+      }else {
+        if (res.data.error) {
+          this.setState({
+            errorMsg: res.data.error.message,
+            register: false
+          });
+        }
+      }
+    });
+  }
+
+  register(){
+    const email = document.getElementById('email').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const password2 = document.getElementById('password2').value;
+
+    if (password != password2) {
+      this.setState({
+        errorMsg: "Passwords does not match",
+      });
+      return
+    }
+    axios.post("http://localhost:3002/users", qs.stringify({email: email,password: password, displayName: username}))
+    .then((res) => {
+      console.log(res);
+      if (res.data.success) {
+        this.props.sucessFunction(email);
+      }else {
+        if (res.data.error) {
+          this.setState({
+            errorMsg: res.data.error.message,
+            register: true
+          });
+        }
+      }
+    });
+  }
+
+  render() {
+    return (
+      <Col sm={8} md={4} style={loginBox}>
+        <h1>{this.state.register ? "Register" : "Login"}</h1>
+        {this.state.errorMsg && <p>{this.state.errorMsg}</p>}
+        <input style={loginInput} id="email" type="email" placeholder="Email addres" autoFocus/>
+        {this.state.register && <input style={loginInput} id="username" type="text" placeholder="Username"/>}
+        <input style={loginInput} id="password" type="password" placeholder="Password"/>
+        {this.state.register && <input style={loginInput} id="password2" type="password" placeholder="Confirm password"/>}
+        <input style={loginInput} onClick={this.state.register ? this.register : this.loginHandler} type="button" value={this.state.register ? "Register" : "Login"} />
+        <a onClick={this.swapSetting}>{this.state.register ? "Already registered? Login!" : "New? Register!"}</a>
+      </Col>
     );
   }
 }
