@@ -18,7 +18,7 @@ exports.createPost = (image, title, description, tags, userName, userId, callbac
 
     db.run("INSERT INTO Posts(AuthorID, AuthorName, Url, CreatedAt, Title, Description, Tags) VALUES(?, ?, ?, ?, ?, ?, ?)", {
         1: userId, 2: userName, 3: url, 4: currentTime, 5: title, 6: description, 7: ((tags instanceof String) ? tags : JSON.stringify(tags))
-    }, (err) => {
+    }, function(err) {
         if (callback && callback instanceof Function) callback(!(err), {
             id: this.lastID,
             userId: userId,
