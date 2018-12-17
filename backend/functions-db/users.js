@@ -82,21 +82,33 @@ exports.createUser = (email, password, displayName, callback) => {
     db.get("SELECT * FROM Users WHERE Email=? OR DisplayName=?", {1: email, 2: displayName}, (err, row) => {
         if (row) {
             if (row.Email === email) {
-                if (callback && callback instanceof Function) callback(false, {message: "Email taken", id: "inUseEmail"});
+                if (callback && callback instanceof Function) callback(false, null, {message: "Email taken", id: "inUseEmail"});
             } else if (row.DisplayName === displayName) {
-                if (callback && callback instanceof Function) callback(false, {message: "Name taken", id: "inUseName"});
+                if (callback && callback instanceof Function) callback(false, null, {message: "Name taken", id: "inUseName"});
             } else {
-                if (callback && callback instanceof Function) callback(false, {message: "Unknown error", id: "unknownError"});
+                if (callback && callback instanceof Function) callback(false, null, {message: "Unknown error", id: "unknownError"});
             }
         } else if (err) {
             console.log(err.message);
             if (callback && callback instanceof Function) callback(false);
         } else {
-            db.run("INSERT INTO Users(Email, Password, Salt, DisplayName) VALUES(?, ?, ?, ?)", { 1: email, 2: pass.hash, 3: pass.salt, 4: displayName }, (err) => {
-                if (err) console.log(err.message);
-                else console.log("Added user " + email);
+            db.run("INSERT INTO Users(Email, Password, Salt, DisplayName) VALUES(?, ?, ?, ?)", {
+                1: email,
+                2: pass.hash,
+                3: pass.salt,
+                4: displayName
+            }, function (err) {
+                if (err) {
+                    if (callback && callback instanceof Function) callback(false);
+                    console.log(err.message);
+                    return;
+                }
 
-                if (callback && callback instanceof Function) callback(!(err));
+                if (callback && callback instanceof Function) callback(true, {
+                    email: email,
+                    displayName: displayName,
+                    id: this.lastID
+                });
             });
         }
     });

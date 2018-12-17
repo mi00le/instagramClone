@@ -22,8 +22,8 @@ app.route("/users").get((req, res) => {
 	});
 }).post((req, res) => {
 	if (req.body.email && req.body.password && req.body.displayName) {
-		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, (result, err) => {
-			res.json(result ? {success: result} : {success: result, error: err});
+		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, (result, user, err) => {
+			res.json(result ? {success: result, user: user} : {success: result, error: err});
 		});
 	} else res.json({success: false, error: {message: "Invalid request, missing email, password, or displayName", id: "missingParams"}});
 });
