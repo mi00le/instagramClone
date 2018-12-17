@@ -1,16 +1,16 @@
-var express = require("express");
-var app = express();
+const express = require("express");
+const app = express();
 
-var bodyParser = require("body-parser");
-var dbUsers = require("./functions-db/users.js");
-var dbPosts = require("./functions-db/posts.js");
+const bodyParser = require("body-parser");
+const dbUsers = require("./functions-db/users.js");
+const dbPosts = require("./functions-db/posts.js");
 
-var cors = require("cors");
+const cors = require("cors");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-var port = process.env.PORT || 3002;
+const port = process.env.PORT || 3002;
 
 app.route("/users").get((req, res) => {
     dbUsers.getAllUsers((result, users) => {
