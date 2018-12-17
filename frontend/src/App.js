@@ -2,30 +2,14 @@ import React, { Component } from "react";
 import axios from "axios";
 import qs from "qs";
 import "./App.css";
-import {
-  Button,
-  Grid,
-  Row,
-  Col,
-  Navbar,
-  Nav,
-  NavItem,
-  NavDropdown,
-  MenuItem,
-  DropdownButton
-} from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCamera } from "@fortawesome/free-solid-svg-icons";
+import { Grid, Row, Col } from "react-bootstrap";
 
-import Popup from "reactjs-popup";
-
-const inputStyle = {
-  width: "100%"
-};
+import Navbar from "./Components/Navbar/index.js";
 
 const imgStyle = {
   width: "100%"
 };
+
 
 const gridItem = {
   margin : "50px auto",
@@ -35,24 +19,33 @@ const gridItem = {
   borderWidth: 1,
   borderRadius: 3,
   padding: "0",
-  background: "#fff",
+  background: "#fff"
 };
 const gridText = {
-  margin: 10,
-}
+  margin: 10
+};
 
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      posts: []
+      posts: [],
+      username : sessionStorage.getItem("username")
     };
+    this.updateInfo = this.updateInfo.bind(this);
+    this.checkUser = this.checkUser.bind(this);
+    this.refreshPosts = this.refreshPosts.bind(this);
 
     this.refreshPosts();
 
-    this.updateInfo = this.updateInfo.bind(this);
-    this.refreshPosts = this.refreshPosts.bind(this);
+
+  }
+    checkUser(){
+    sessionStorage.clear();
+    this.setState({
+       username: null
+     });
   }
   updateInfo() {
     let u = document.querySelector("#imgUrl");
@@ -80,12 +73,10 @@ class App extends Component {
 
   render() {
     return (
-      <div style={{background: "#f7f7f7"}} className="App">
-      <header>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
-      </header>
-        <NAVBAR handler={this.updateInfo} />
-
+      <div className="App">
+        <header>
+        </header>
+        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
         <Posts items={this.state.posts} />
       </div>
     );
@@ -123,83 +114,6 @@ class Post extends Component {
           <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{new Date(this.props.createdAt).toDateString()}</p>
         </div>
       </Col>);
-  }
-}
-
-class NAVBAR extends Component {
-  render() {
-    return (
-      <Navbar fixedTop collapseOnSelect style={{ backgroundColor: "#EDEDED" }}>
-        <Grid style={{ color: "#000" }}>
-          <Row className="show-grid">
-            <Col xs={6} sm={6} md={6} style={{ textAlign: "left" }}>
-              <Popup
-                style={{ border: "none", padding: "0px" }}
-                trigger={
-                  <FontAwesomeIcon
-                    href="#brand"
-                    id="basic-nav-dropdown"
-                    icon={faCamera}
-                    style={{ fontSize: "35px", marginTop: "15px" }}
-                  />
-                }
-                modal
-                closeOnDocumentClick
-              >
-                <form style={inputStyle}>
-                  <div className="row">
-                    <div className="col">
-                      <input
-                        type="text"
-                        id="imgUrl"
-                        style={inputStyle}
-                        className="form-control"
-                        placeholder="Image Url"
-                        autoFocus
-                      />
-                    </div>
-                    <div className="col">
-                      <input
-                        type="text"
-                        style={inputStyle}
-                        className="form-control"
-                        id="title"
-                        placeholder="Title"
-                      />
-                    </div>
-                    <div className="col">
-                      <textarea
-                        style={inputStyle}
-                        className="form-control"
-                        id="desc"
-                        placeholder="Description"
-                      />
-                    </div>
-                    <div className="col">
-                      <button
-                        type="button"
-                        style={inputStyle}
-                        className="form-control btn-primary"
-                        onClick={this.props.handler}
-                      >
-                        Upload
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </Popup>
-            </Col>
-            <Col xs={6} sm={6} md={6} style={{ textAlign: "right" }}>
-              <a href="#" style={{ color: "black", textDecoration: "none" }}>
-                <p style={{ fontSize: "30px", marginTop: "10px" }}>
-                  InstaClone
-                </p>
-              </a>
-            </Col>
-          </Row>
-        </Grid>
-      </Navbar>
-    );
   }
 }
 
