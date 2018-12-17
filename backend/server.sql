@@ -1,3 +1,11 @@
+CREATE TABLE `Users` (
+    `ID` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    `Email` TEXT NOT NULL UNIQUE,
+    `Password` TEXT NOT NULL,
+    `Salt` TEXT NOT NULL,
+    `DisplayName` TEXT NOT NULL UNIQUE
+);
+
 CREATE TABLE `Posts` (
     `ID` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
     `AuthorID` INTEGER NOT NULL,
@@ -7,14 +15,5 @@ CREATE TABLE `Posts` (
     `Title` TEXT,
     `Description` TEXT,
     `Tags` TEXT,
-    FOREIGN KEY(`AuthorID`) REFERENCES Users(ID),
-    FOREIGN KEY(`AuthorName`) REFERENCES Users(DisplayName)
-);
-
-CREATE TABLE `Users` (
-    `ID` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-    `Email` TEXT NOT NULL,
-    `Password` TEXT NOT NULL,
-    `Salt` TEXT NOT NULL,
-    `DisplayName` TEXT NOT NULL
+    FOREIGN KEY(`AuthorID`) REFERENCES Users(ID)
 );
