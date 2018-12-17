@@ -23,7 +23,7 @@ const gridItem = {
   padding: "0",
   background: "#fff"
 };
-let gridText = {
+const gridText = {
   margin: 10
 };
 
