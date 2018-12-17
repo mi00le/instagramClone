@@ -4,9 +4,7 @@ import qs from "qs";
 import "./App.css";
 import { Grid, Row, Col } from "react-bootstrap";
 
-import NAVBAR from "./Components/NAVBAR.js";
-
-let date = new Date().toLocaleString();
+import Navbar from "./Components/Navbar/index.js";
 
 const imgStyle = {
   width: "100%"
@@ -38,9 +36,9 @@ class App extends Component {
     this.updateInfo = this.updateInfo.bind(this);
     this.checkUser = this.checkUser.bind(this);
     this.refreshPosts = this.refreshPosts.bind(this);
-    
+
     this.refreshPosts();
-    
+
 
   }
     checkUser(){
@@ -48,7 +46,7 @@ class App extends Component {
     this.setState({
        username: null
      });
-  
+  }
   updateInfo() {
     let u = document.querySelector("#imgUrl");
     let t = document.querySelector("#title");
@@ -77,27 +75,8 @@ class App extends Component {
     return (
       <div className="App">
         <header>
-          <link
-            rel="stylesheet"
-            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-            integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-            crossOrigin="anonymous"
-          />
-          <script
-            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-            integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
-            crossOrigin="anonymous"
-          />
-          <link
-            href="https://fonts.googleapis.com/css?family=Lobster"
-            rel="stylesheet"
-          />
-          <link
-            rel="stylesheet"
-            href="https://www.w3schools.com/w3css/4/w3.css"
-          />
         </header>
-        <NAVBAR handler={this.updateInfo} handleLogout={this.checkUser} />
+        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
         <Posts items={this.state.posts} />
       </div>
     );

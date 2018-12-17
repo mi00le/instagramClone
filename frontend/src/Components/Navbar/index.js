@@ -1,16 +1,16 @@
 import React from "react";
-import "../navbar.css";
+import "./navbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 
 import Popup from "reactjs-popup";
 
-import { Grid, Row, Col, Navbar } from "react-bootstrap";
+import { Grid, Row, Col, Navbar as BSNavbar } from "react-bootstrap";
 
-export default class NAVBAR extends React.Component {
+export default class Navbar extends React.Component {
   render() {
     return (
-      <Navbar fixedTop collapseOnSelect className="navbar-main">
+      <BSNavbar fixedTop collapseOnSelect className="navbar-main">
         <Grid className="grid">
           <Row className="show-grid">
             <Col xs={4} className="col-left">
@@ -95,7 +95,7 @@ export default class NAVBAR extends React.Component {
             </Col>
           </Row>
         </Grid>
-      </Navbar>
+      </BSNavbar>
     );
   }
 }
