@@ -1,4 +1,4 @@
-var sql = require('./db-init.js');
+var sql = require("./db-init.js");
 var db = sql.getDb();
 
 exports.createPost = (image, title, description, tags, userName, userId, callback) => {
@@ -34,9 +34,7 @@ exports.createPost = (image, title, description, tags, userName, userId, callbac
 
 exports.getPost = (postId, callback) => {
     db.get("SELECT * FROM Posts WHERE ID=?", postId, (err, row) => {
-        if (err) {
-            console.log(err.message);
-        } else if (row) {
+        if (row) {
             if (callback && callback instanceof Function) callback(true, {
                 id: row.ID,
                 userId: row.AuthorID,
@@ -50,12 +48,11 @@ exports.getPost = (postId, callback) => {
             return;
         }
         if (callback && callback instanceof Function) callback(false);
-    })
+    });
 };
 
 exports.getAllPosts = (limit, callback) => {
     db.all("SELECT * FROM Posts", (err, rows) => {
-        if (err) console.log(err.message);
         if (rows) {
             var result = [];
             for (var i = rows.length - 1; i >= 0; i--) {
@@ -82,7 +79,6 @@ exports.getAllPosts = (limit, callback) => {
 
 exports.getAllPostsFromUser = (userId, callback) => {
     db.all("SELECT * FROM Posts WHERE AuthorID=?", userId, (err, rows) => {
-        if (err) console.log(err.message);
         if (rows) {
             var result = [];
             for (var i = rows.length - 1; i >= 0; i--) {
@@ -107,14 +103,15 @@ exports.updatePost = (postId, title, description, tags, callback) => {
     db.get("SELECT * FROM Posts WHERE ID=?", postId, (err, row) => {
         if (row) {
             db.run("UPDATE Posts SET Title=?,Description=?,Tags=? WHERE ID=?",
-            {
-                1: title ? title : row.Title,
-                2: description ? description : row.Description,
-                3: tags ? tags : row.Tags,
-                4: postId
-            }, (err) => {
-                if (callback && callback instanceof Function) callback(!(err));
-            });
+                {
+                    1: title ? title : row.Title,
+                    2: description ? description : row.Description,
+                    3: tags ? tags : row.Tags,
+                    4: postId
+                }, (err) => {
+                    if (callback && callback instanceof Function) callback(!(err));
+                }
+            );
         } else {
             if (callback && callback instanceof Function) callback(false);
         }
