@@ -1,107 +1,119 @@
-import React, { Component } from 'react';
-// import logo from './logo.svg';
-import img from './img.jpg';
-import './App.css';
-import { Button,Grid,Row,Col,Navbar,Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
+import React, { Component } from "react";
+import axios from "axios";
+import qs from "qs";
+import "./App.css";
+import { Grid, Row, Col } from "react-bootstrap";
 
+import Navbar from "./Components/Navbar/index.js";
 
 const imgStyle = {
-
-  width : 500,
-  heigth : 500
-
+  width: "100%"
 };
 
-//title img auth
-let userPost = [{
-  title : "Good Morning",
-  img : img,
-  user : "Michael"
-}];
 
-// console.log(userPost[0]);
-
-
+const gridItem = {
+  margin : "50px auto",
+  float: "none",
+  borderStyle: "solid",
+  borderColor: "#e6e6e6",
+  borderWidth: 1,
+  borderRadius: 3,
+  padding: "0",
+  background: "#fff"
+};
+const gridText = {
+  margin: 10
+};
 
 class App extends Component {
+  constructor(props) {
+    super(props);
 
-  // state = {
-  //   selectedFile : null
-  // }
-  //
-  // fileSelectedHandler = event => {
-  //   this.setState({
-  //     selectedFile : event.target.files[0]
-  //   })
-  // }
-  //
-  // fileUploadHandler = () => {
-  //
-  // }
+    this.state = {
+      posts: [],
+      username : sessionStorage.getItem("username")
+    };
+    this.updateInfo = this.updateInfo.bind(this);
+    this.checkUser = this.checkUser.bind(this);
+    this.refreshPosts = this.refreshPosts.bind(this);
+
+    this.refreshPosts();
+
+
+  }
+    checkUser(){
+    sessionStorage.clear();
+    this.setState({
+       username: null
+     });
+  }
+  updateInfo() {
+    let u = document.querySelector("#imgUrl");
+    let t = document.querySelector("#title");
+    let d = document.querySelector("#desc");
+
+    axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: {}}))
+    .then((res) => {
+      if (res.data.post) {
+        this.setState({posts: [res.data.post, ...this.state.posts]});
+      } else {
+        this.refreshPosts();
+      }
+    });
+  }
+  refreshPosts() {
+    axios.get("http://localhost:3002/posts")
+    .then((response) => {
+      this.setState({
+        posts: response.data.posts
+      });
+    });
+  }
+
 
   render() {
     return (
       <div className="App">
-      <header className="App-header">
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
-      {/* <input type="file" id="file" onChange={this.fileSelectedHandler}/>
-      <label for="fileupload"> Select a file to upload</label>
-      <input type="submit" value="submit" onClick={this.fileSelectedHandler} />
-      <p>{userPost[0].title}</p>
-      <img src={userPost[0].img} style={imgStyle} />
-      <p>{userPost[0].user}</p> */}
-
-      <Navbar inverse collapseOnSelect >
-  <Navbar.Header>
-    <Navbar.Brand>
-      <a href="#brand">React-Bootstrap</a>
-    </Navbar.Brand>
-    <Navbar.Toggle />
-  </Navbar.Header>
-  <Navbar.Collapse>
-    <Nav>
-      <NavItem eventKey={1} href="#">
-        Link
-      </NavItem>
-      <NavItem eventKey={2} href="#">
-        Link
-      </NavItem>
-      <NavDropdown eventKey={3} title="Dropdown" id="basic-nav-dropdown">
-        <MenuItem eventKey={3.1}>Action</MenuItem>
-        <MenuItem eventKey={3.2}>Another action</MenuItem>
-        <MenuItem eventKey={3.3}>Something else here</MenuItem>
-        <MenuItem divider />
-        <MenuItem eventKey={3.3}>Separated link</MenuItem>
-      </NavDropdown>
-    </Nav>
-    <Nav pullRight>
-      <NavItem eventKey={1} href="#">
-        Link Right
-      </NavItem>
-      <NavItem eventKey={2} href="#">
-        Link Right
-      </NavItem>
-    </Nav>
-  </Navbar.Collapse>
-</Navbar>
-
-
-      <Grid>
-        <Row className="show-grid">
-          <Col sm={6} md={6}>
-            <img src={"https://via.placeholder.com/300"} />
-          </Col>
-          <Col sm={6} md={6}>
-            <img src={"https://via.placeholder.com/300"} />
-          </Col>
-        </Row>
-      </Grid>
-
-
-
-      </header>
+        <header>
+        </header>
+        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
+        <Posts items={this.state.posts} />
       </div>
     );
+  }
+}
+
+class Posts extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <Grid>
+        <Row className="show-grid">
+          {this.props.items.map(post => <Post title={post.title} imgUrl={post.url} description={post.description} username={post.username} createdAt={post.createdAt} />)}
+        </Row>
+      </Grid>
+    );
+  }
+}
+
+class Post extends Component {
+  render() {
+    return (
+      <Col sm={12} md={8} style={gridItem}>
+        <h3 style={gridText}>{this.props.title}</h3>
+        <img style={imgStyle} src={this.props.imgUrl} />
+        <div style={{width: "70%", margin: "0 auto"}}>
+        <p style={{margin: 10}}>{this.props.description}</p>
+        </div>
+        <hr style={{margin: 0}}/>
+        <div style={{width: "70%", margin: "0 auto"}}>
+          <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a href="#">{this.props.username}</a></p>
+          <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{new Date(this.props.createdAt).toDateString()}</p>
+        </div>
+      </Col>);
   }
 }
 
