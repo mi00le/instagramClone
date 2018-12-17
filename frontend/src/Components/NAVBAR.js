@@ -13,7 +13,7 @@ export default class NAVBAR extends React.Component {
       <Navbar fixedTop collapseOnSelect className="navbar-main">
         <Grid className="grid">
           <Row className="show-grid">
-            <Col xs={6} sm={6} md={6} className="col-left">
+            <Col xs={4} className="col-left">
               <Popup
                 className="w3-animate-top popup"
                 trigger={
@@ -57,7 +57,7 @@ export default class NAVBAR extends React.Component {
                         required
                       />
                     </div>
-                    <div className="col">
+                    <div className="col text-fix">
                       <textarea
                         className="form-control input-style"
                         id="desc"
@@ -79,9 +79,18 @@ export default class NAVBAR extends React.Component {
                 </form>
               </Popup>
             </Col>
-            <Col xs={6} sm={6} md={6} className="col-right">
+            <Col xs={4}className="col-right">
               <a href="#top" className="insta-clone">
-                <p className="insta-clone">InstaClone</p>
+                <p className="insta-clone disable-select ">InstaClone</p>
+              </a>
+            </Col>
+            <Col xs={4} className="col-right">
+              <a
+                href="#logout"
+                className="logout-nav"
+                onClick={this.props.handleLogout}
+              >
+                <p className="logout-nav disable-select ">Logout</p>
               </a>
             </Col>
           </Row>

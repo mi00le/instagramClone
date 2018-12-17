@@ -57,10 +57,12 @@ class App extends Component {
     super(props);
 
     this.state = {
-      posts: userPosts
+      posts: userPosts,
+      username : sessionStorage.getItem("username")
     };
-
+    console.log(this.state.username);
     this.updateInfo = this.updateInfo.bind(this);
+    this.checkUser = this.checkUser.bind(this);
   }
   updateInfo() {
     let u = document.querySelector("#imgUrl");
@@ -84,6 +86,12 @@ class App extends Component {
     } else {
       u.style.border = "2px solid red";
     }
+  }
+  checkUser(){
+    sessionStorage.clear();
+    this.setState({
+       username: null
+     });
   }
 
   render() {
@@ -110,7 +118,7 @@ class App extends Component {
             href="https://www.w3schools.com/w3css/4/w3.css"
           />
         </header>
-        <NAVBAR handler={this.updateInfo} />
+        <NAVBAR handler={this.updateInfo} handleLogout={this.checkUser} />
         <Posts items={this.state.posts} />
       </div>
     );
