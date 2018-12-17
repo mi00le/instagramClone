@@ -41,7 +41,7 @@ const gridText = {
   margin: 10,
 }
 const loginBox = {
-  margin : "80px auto",
+  margin : "200px auto",
   float: "none",
   borderStyle: "solid",
   borderColor: "#e6e6e6",
@@ -68,19 +68,24 @@ class App extends Component {
     this.state = {
       posts: [],
       username: sessionStorage.getItem("username"),
+      userId: sessionStorage.getItem("id"),
+      postCount: 5,
+      id: 0,
     };
     this.refreshPosts();
 
     this.updateInfo = this.updateInfo.bind(this);
     this.refreshPosts = this.refreshPosts.bind(this);
     this.login = this.login.bind(this);
+    this.loadMorePosts = this.loadMorePosts.bind(this);
+    this.userClick = this.userClick.bind(this);
   }
   updateInfo() {
     let u = document.querySelector("#imgUrl");
     let t = document.querySelector("#title");
     let d = document.querySelector("#desc");
 
-    axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: {}}))
+    axios.post("http://localhost:3002/posts/" + this.state.userId, qs.stringify({image: u.value, title: t.value, description: d.value, username: this.state.username, tags: {}}))
     .then((res) => {
       if (res.data.post) {
         this.setState({posts: [res.data.post, ...this.state.posts]});
@@ -90,33 +95,76 @@ class App extends Component {
     });
   }
   refreshPosts() {
-    axios.get("http://localhost:3002/posts")
-    .then((response) => {
-      this.setState({
-        posts: response.data.posts
+    if (!this.state.id) {
+      axios.get("http://localhost:3002/posts?limit=" + this.state.postCount)
+      .then((response) => {
+        console.log(response.data.posts);
+        this.setState({
+          posts: response.data.posts
+        });
       });
+    }
+    else {
+      axios.get("http://localhost:3002/posts/"+ this.state.id)
+      .then((response) => {
+        this.setState({
+          posts: response.data.posts
+        });
+      });
+    }
+  }
+  loadMorePosts(){
+    const amount = 5;
+    this.setState({
+      postCount: this.state.postCount + amount,
+    }, () => {
+      this.refreshPosts();
     });
   }
 
-  login(email, username) {
+  login(email, username, id) {
     this.setState({
-      username: email,
+      username: username,
+      userId: id
     });
-    sessionStorage.setItem("username", email)
+    sessionStorage.setItem("email", email)
+    sessionStorage.setItem("username", username)
+        sessionStorage.setItem("id", id)
+  }
+
+  userClick(id){
+    this.setState({
+      id: id
+    }, () => {
+      this.refreshPosts();
+    });
   }
 
 
   render() {
     return (
-      <div style={{background: "#f7f7f7"}} className="App">
+      <div style={this.state.username ? {background: "#f7f7f7"} : {background: "#fff"}} className="App">
       <header>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
       </header>
         <NAVBAR handler={this.updateInfo} />
-
-        {this.state.username ? <Posts items={this.state.posts} /> : <Login sucessFunction={this.login} /> }
+        {this.state.username ? <Posts profile={this.state.id} items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} /> }
       </div>
     );
+  }
+}
+
+class Profile extends Component{
+  constructor(props) {
+    super(props);
+  }
+  render () {
+    return (
+      <div style={{margin: "50px auto"}}>
+        <h2>This is {this.props.name}s posts</h2>
+        <a onClick={() => {this.props.userClick(0)}}>go back to all posts!</a>
+      </div>
+    )
   }
 }
 
@@ -130,7 +178,7 @@ class Login extends Component {
     };
 
     this.swapSetting = this.swapSetting.bind(this);
-    this.loginHandler = this.loginHandler.bind(this);
+    this.login = this.login.bind(this);
     this.register = this.register.bind(this);
   }
 
@@ -141,13 +189,13 @@ class Login extends Component {
     });
   }
 
-  loginHandler(){
+  login(){
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value
     axios.post("http://localhost:3002/users/auth", qs.stringify({email: email,password: password}))
     .then((res) => {
       if (res.data.success) {
-        this.props.sucessFunction(email);
+        this.props.sucessFunction(email, res.data.users.displayName, res.data.users.id);
       }else {
         if (res.data.error) {
           this.setState({
@@ -175,7 +223,7 @@ class Login extends Component {
     .then((res) => {
       console.log(res);
       if (res.data.success) {
-        this.props.sucessFunction(email);
+        this.props.sucessFunction(email, username, res.data.user.id);
       }else {
         if (res.data.error) {
           this.setState({
@@ -189,18 +237,26 @@ class Login extends Component {
 
   render() {
     return (
-      <Col sm={8} md={4} style={loginBox}>
-        <h1>{this.state.register ? "Register" : "Login"}</h1>
-        {this.state.errorMsg && <p>{this.state.errorMsg}</p>}
-        <input style={loginInput} id="email" type="email" placeholder="Email addres" autoFocus/>
-        {this.state.register && <input style={loginInput} id="username" type="text" placeholder="Username"/>}
-        <input style={loginInput} id="password" type="password" placeholder="Password"/>
-        {this.state.register && <input style={loginInput} id="password2" type="password" placeholder="Confirm password"/>}
-        <input style={loginInput} onClick={this.state.register ? this.register : this.loginHandler} type="button" value={this.state.register ? "Register" : "Login"} />
-        <a onClick={this.swapSetting}>{this.state.register ? "Already registered? Login!" : "New? Register!"}</a>
-      </Col>
+      <div style={loginDiv}>
+        <Col sm={8} md={4} style={loginBox}>
+          <h1>{this.state.register ? "Register" : "Login"}</h1>
+          {this.state.errorMsg && <p>{this.state.errorMsg}</p>}
+          <input style={loginInput} id="email" type="email" placeholder="Email addres" autoFocus/>
+          {this.state.register && <input style={loginInput} id="username" type="text" placeholder="Username"/>}
+          <input style={loginInput} id="password" type="password" placeholder="Password"/>
+          {this.state.register && <input style={loginInput} id="password2" type="password" placeholder="Confirm password"/>}
+          <input style={loginInput} onClick={this.state.register ? this.register : this.login} type="button" value={this.state.register ? "Register" : "Login"} />
+          <a onClick={this.swapSetting}>{this.state.register ? "Already registered? Login!" : "New? Register!"}</a>
+        </Col>
+      </div>
     );
   }
+}
+
+const loginDiv = {
+  height: "100%",
+  position: "relative",
+  height: 800
 }
 
 class Posts extends Component {
@@ -210,11 +266,15 @@ class Posts extends Component {
 
   render() {
     return (
+      <div>
       <Grid>
         <Row className="show-grid">
-          {this.props.items.map(post => <Post title={post.title} imgUrl={post.url} description={post.description} username={post.username} createdAt={post.createdAt} />)}
+        {this.props.profile && <Profile name={this.props.items[0].username} userClick={this.props.userClick} />}
+          {this.props.items.map(post => <Post title={post.title} imgUrl={post.url} description={post.description} username={post.username} id={post.userId} createdAt={post.createdAt} userClick={this.props.userClick} />)}
         </Row>
       </Grid>
+        <button onClick={this.props.loadMore} style={{width: "100%", height: 40, background: "white", borderWidth: 0, borderTopWidth: 1}}>Load More!</button>
+      </div>
     );
   }
 }
@@ -230,7 +290,7 @@ class Post extends Component {
         </div>
         <hr style={{margin: 0}}/>
         <div style={{width: "70%", margin: "0 auto"}}>
-          <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a href="#">{this.props.username}</a></p>
+          <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a onClick={() => {this.props.userClick(this.props.id)}}>{this.props.username}</a></p>
           <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{new Date(this.props.createdAt).toDateString()}</p>
         </div>
       </Col>);
