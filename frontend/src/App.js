@@ -10,7 +10,6 @@ const imgStyle = {
   width: "100%"
 };
 
-
 const gridItem = {
   margin : "50px auto",
   float: "none",
@@ -21,9 +20,11 @@ const gridItem = {
   padding: "0",
   background: "#fff"
 };
+
 const gridText = {
   margin: 10,
 }
+
 const loginBox = {
   margin : "200px auto",
   float: "none",
@@ -34,6 +35,7 @@ const loginBox = {
   padding: "0",
   background: "#fff",
 }
+
 const loginInput = {
   width: "80%",
   height: 30,
@@ -51,8 +53,8 @@ class App extends Component {
 
     this.state = {
       posts: [],
-      username: sessionStorage.getItem("username"),
-      userId: sessionStorage.getItem("id"),
+      username: localStorage.getItem("username"),
+      userId: localStorage.getItem("id"),
       postCount: 5,
       id: 0,
     };
@@ -67,7 +69,7 @@ class App extends Component {
   }
 
   checkUser(){
-  sessionStorage.clear();
+  localStorage.clear();
   this.setState({
      username: null
    });
@@ -85,7 +87,7 @@ class App extends Component {
       } else {
         this.refreshPosts();
       }
-    });
+    }).catch(() => {});
   }
   refreshPosts() {
     if (!this.state.id) {
@@ -95,7 +97,7 @@ class App extends Component {
         this.setState({
           posts: response.data.posts
         });
-      });
+      }).catch(() => {});;
     }
     else {
       axios.get("http://localhost:3002/posts/"+ this.state.id)
@@ -103,11 +105,11 @@ class App extends Component {
         this.setState({
           posts: response.data.posts
         });
-      });
+      }).catch(() => {});;
     }
   }
   loadMorePosts(){
-    const amount = 5;
+    const amount = 10;
     this.setState({
       postCount: this.state.postCount + amount,
     }, () => {
@@ -120,9 +122,9 @@ class App extends Component {
       username: username,
       userId: id
     });
-    sessionStorage.setItem("email", email)
-    sessionStorage.setItem("username", username)
-        sessionStorage.setItem("id", id)
+    localStorage.setItem("email", email);
+    localStorage.setItem("username", username);
+    localStorage.setItem("id", id);
   }
 
   userClick(id){
@@ -147,20 +149,43 @@ class App extends Component {
   }
 }
 
+const flexItem = {
+  padding: "3px 7px",
+  margin: "5px 20px" ,
+  border: "1px solid #e6e6e6",
+  background: "#fff",
+  borderRadius: 3,
+};
+const profileButton = {
+  margin: 12,
+width: "30%",
+ height: 40,
+ background: "white",
+ borderWidth: 0,
+ borderTopWidth: 1}
+
 class Profile extends Component{
   constructor(props) {
     super(props);
   }
   render () {
     return (
-      <div style={{margin: "50px auto"}}>
-        <h2>This is {this.props.name}s posts</h2>
-        <a onClick={() => {this.props.userClick(0)}}>go back to all posts!</a>
+      <div style={profileStyle}>
+        <h2>{this.props.name}</h2>
+        <div style={{display: "flex", justifyContent: "center"}}>
+          <Col xs={6} sm={4} md={3} style={flexItem}><h4>Posts: {this.props.count}</h4></Col>
+          <Col xs={6} sm={4} md={3} style={flexItem}><h4>Newest: {new Date(this.props.newest).toLocaleDateString()}</h4></Col>
+        </div>
+        <button style={profileButton} onClick={() => {this.props.userClick(0)}}>Go back!</button>
+        <hr style={{margin: "20px 0 auto", background: "black"}} />
       </div>
     )
   }
 }
 
+const profileStyle = {
+  margin: "80px auto 40px auto"
+}
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -198,7 +223,7 @@ class Login extends Component {
           });
         }
       }
-    });
+    }).catch(() => {});;
   }
 
   register(){
@@ -226,7 +251,7 @@ class Login extends Component {
           });
         }
       }
-    });
+    }).catch(() => {});;
   }
 
   render() {
@@ -234,13 +259,18 @@ class Login extends Component {
       <div style={loginDiv}>
         <Col sm={8} md={4} style={loginBox}>
           <h1>{this.state.register ? "Register" : "Login"}</h1>
+          <hr />
           {this.state.errorMsg && <p>{this.state.errorMsg}</p>}
-          <input style={loginInput} id="email" type="email" placeholder="Email addres" autoFocus/>
-          {this.state.register && <input style={loginInput} id="username" type="text" placeholder="Username"/>}
-          <input style={loginInput} id="password" type="password" placeholder="Password"/>
-          {this.state.register && <input style={loginInput} id="password2" type="password" placeholder="Confirm password"/>}
+          <h4>Email</h4>
+          <input style={loginInput} id="email" type="email" autoFocus/>
+          {this.state.register && <h4>Username</h4>}
+          {this.state.register && <input style={loginInput} id="username" type="text"/>}
+          <h4>Password</h4>
+          <input style={loginInput} id="password" type="password"/>
+          {this.state.register && <h4>Confirm password</h4>}
+          {this.state.register && <input style={loginInput} id="password2" type="password"/>}
           <input style={loginInput} onClick={this.state.register ? this.register : this.login} type="button" value={this.state.register ? "Register" : "Login"} />
-          <a onClick={this.swapSetting}>{this.state.register ? "Already registered? Login!" : "New? Register!"}</a>
+          <a style={{marginBottom: 10, display: "block"}} onClick={this.swapSetting}>{this.state.register ? "Already registered? Login!" : "New? Register!"}</a>
         </Col>
       </div>
     );
@@ -263,11 +293,12 @@ class Posts extends Component {
       <div>
       <Grid>
         <Row className="show-grid">
-        {this.props.profile && <Profile name={this.props.items[0].username} userClick={this.props.userClick} />}
+        {console.log(this.props.items)}
+        {this.props.profile && <Profile newest={this.props.items[0].createdAt} count={this.props.items.length} name={this.props.items[0].username} userClick={this.props.userClick} />}
           {this.props.items.map(post => <Post title={post.title} imgUrl={post.url} description={post.description} username={post.username} id={post.userId} createdAt={post.createdAt} userClick={this.props.userClick} />)}
         </Row>
       </Grid>
-        <button onClick={this.props.loadMore} style={{width: "100%", height: 40, background: "white", borderWidth: 0, borderTopWidth: 1}}>Load More!</button>
+        {!this.props.profile && <button onClick={this.props.loadMore} style={{width: "100%", height: 40, background: "white", borderWidth: 0, borderTopWidth: 1}}>Load More!</button>}
       </div>
     );
   }
