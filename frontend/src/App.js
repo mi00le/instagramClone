@@ -4,7 +4,8 @@ import qs from "qs";
 import "./App.css";
 import { Grid, Row, Col } from "react-bootstrap";
 
-import Navbar from "./Components/Navbar/index.js";
+import Navbar from "./Components/Navbar/";
+import tools from "./Components/Functions/";
 
 const imgStyle = {
   width: "100%"
@@ -79,8 +80,9 @@ class App extends Component {
     let u = document.querySelector("#imgUrl");
     let t = document.querySelector("#title");
     let d = document.querySelector("#desc");
+    let tag = document.querySelector("#tags");
 
-    axios.post("http://localhost:3002/posts/" + this.state.userId, qs.stringify({image: u.value, title: t.value, description: d.value, username: this.state.username, tags: {}}))
+    axios.post("http://localhost:3002/posts/" + this.state.userId, qs.stringify({image: u.value, title: t.value, description: d.value, username: this.state.username, tags: tag.value}))
     .then((res) => {
       if (res.data.post) {
         this.setState({posts: [res.data.post, ...this.state.posts]});
@@ -97,7 +99,7 @@ class App extends Component {
         this.setState({
           posts: response.data.posts
         });
-      }).catch(() => {});;
+      }).catch(() => {});
     }
     else {
       axios.get("http://localhost:3002/posts/"+ this.state.id)
@@ -295,7 +297,7 @@ class Posts extends Component {
         <Row className="show-grid">
         {console.log(this.props.items)}
         {this.props.profile && <Profile newest={this.props.items[0].createdAt} count={this.props.items.length} name={this.props.items[0].username} userClick={this.props.userClick} />}
-          {this.props.items.map(post => <Post title={post.title} imgUrl={post.url} description={post.description} username={post.username} id={post.userId} createdAt={post.createdAt} userClick={this.props.userClick} />)}
+          {this.props.items.map(post => <Post tags={post.tags} title={post.title} imgUrl={post.url} description={post.description} username={post.username} id={post.userId} createdAt={post.createdAt} userClick={this.props.userClick} />)}
         </Row>
       </Grid>
         {!this.props.profile && <button onClick={this.props.loadMore} style={{width: "100%", height: 40, background: "white", borderWidth: 0, borderTopWidth: 1}}>Load More!</button>}
@@ -303,7 +305,15 @@ class Posts extends Component {
     );
   }
 }
-
+const postItem = {
+  width: "33.33%",
+  border: "solid 1px #e6e6e6",
+  borderTopWidth: 0,
+  borderBottomWidht: 0,
+}
+const postItemText = {
+  margin: 8
+}
 class Post extends Component {
   render() {
     return (
@@ -314,9 +324,16 @@ class Post extends Component {
         <p style={{margin: 10}}>{this.props.description}</p>
         </div>
         <hr style={{margin: 0}}/>
-        <div style={{width: "70%", margin: "0 auto"}}>
-          <p style={{textAlign: "left", display: "inline-block", width: "50%", margin: "10px 0"}}>by <a onClick={() => {this.props.userClick(this.props.id)}}>{this.props.username}</a></p>
-          <p style={{textAlign: "right", display: "inline-block", width: "50%", margin: "10px 0"}}>{new Date(this.props.createdAt).toDateString()}</p>
+        <div style={{width: "100%", display: "flex", justifyContent: "center"}}>
+          <div style={postItem}>
+            <p style={postItemText}>by <a onClick={() => {this.props.userClick(this.props.id)}}>{this.props.username}</a></p>
+          </div>
+          <div style={postItem}>
+            <p style={postItemText}>{this.props.tags.replace(/"/g, '') ? this.props.tags.replace(/"/g, '').split(",").map((text) => <a style={{margin: "0 3px"}} href="#">{text}</a>) : "no tags"}</p>
+          </div>
+          <div style={postItem}>
+            <p style={postItemText}>{tools.timeSince(new Date(this.props.createdAt))} ago</p>
+          </div>
         </div>
       </Col>);
   }
