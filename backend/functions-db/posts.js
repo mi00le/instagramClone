@@ -2,105 +2,120 @@ const sql = require("./db-init.js");
 const utils = require("../utils/posts");
 const db = sql.getDb();
 
-exports.createPost = (image, title, description, tags, userName, userId, callback) => {
-    if (!userId || !userName) {
-        if (callback && callback instanceof Function) callback(false);
-        return;
-    }
-
-    // upload image somehow
-    const url = typeof image === "string" ? image : "testStringPlsFix";
-
-    title = title ? title : "";
-    description = description ? description : "";
-    tags = tags ? tags : "";
-
-    const currentTime = new Date().getTime();
-
-    const prep = db.prepare("INSERT INTO Posts(AuthorID, AuthorName, Url, CreatedAt, Title, Description, Tags) VALUES(?, ?, ?, ?, ?, ?, ?)");
-    const result = prep.run(userId, userName, url, currentTime, title, description, tags);
-
-    if (callback && callback instanceof Function) callback(!!(result), {
-        id: result.lastInsertRowid,
-        userId: userId,
-        username: userName,
-        url: url,
-        createdAt: currentTime,
-        title: title,
-        description: description,
-        tags: tags
-    });
-};
-
-exports.getPost = (postId, callback) => {
-    const row = db.prepare("SELECT * FROM Posts WHERE ID=?").get(postId);
-
-    if (row) {
-        if (callback && callback instanceof Function) callback(true, {
-            id: row.ID,
-            userId: row.AuthorID,
-            username: row.AuthorName,
-            url: row.Url,
-            createdAt: row.CreatedAt,
-            title: row.Title,
-            description: row.Description,
-            tags: row.Tags
-        });
-    } else if (callback && callback instanceof Function) callback(false);
-};
-
-exports.getAllPosts = (limit = -1) => new Promise(async (resolve, reject) => {
+/**
+ * Create a post and insert it into the database
+ * @param {*} image - The image to be stored, as a blob
+ * @param {string} [title] - Post title
+ * @param {string} [description] - Post description
+ * @param {string} [tags] - Post tags, as a comma-separated string
+ * @param {string} userName - Post author's display name
+ * @param {string|number} userId - Post author's ID
+ */
+exports.createPost = (image, title, description, tags, userName, userId) => new Promise(async (resolve, reject) => {
     try {
-        const rows = await db.prepare("SELECT * FROM Posts LIMIT ?").all(limit);
-        return resolve(rows.map(utils.toClientStructure));
+        if (!userId || !userName) {
+            return reject();
+        }
+    
+        title = title ? title : "";
+        description = description ? description : "";
+        tags = tags ? tags : "";
+    
+        const currentTime = new Date().getTime();
+    
+        const prep = db.prepare("INSERT INTO Posts(AuthorID, AuthorName, Url, CreatedAt, Title, Description, Tags) VALUES(?, ?, ?, ?, ?, ?, ?)");
+        const result = prep.run(userId, userName, image, currentTime, title, description, tags);
+    
+        return resolve({
+            id: result.lastInsertRowid,
+            userId: userId,
+            username: userName,
+            url: image,
+            createdAt: currentTime,
+            title: title,
+            description: description,
+            tags: tags
+        });
     } catch (e) {
         return reject(e);
     }
 });
 
-exports.getAllPostsFromUser = (userId, callback) => {
-    const rows = db.prepare("SELECT * FROM Posts WHERE AuthorID=?").all(userId);
+/**
+ * Get single post
+ * @param {string|number} postId - ID of post to return
+ */
+exports.getPost = (postId) => new Promise(async (resolve, reject) => {
+    try {
+        const row = db.prepare("SELECT * FROM Posts WHERE ID=?").get(postId);
+        return resolve(utils.toClientStructure(row));
+    } catch (e) {
+        return reject(e);
+    }
+});
 
-    if (rows) {
-        let result = [];
-        for (let i = rows.length - 1; i >= 0; --i) {
-            let obj = rows[i];
-            result.push({
-                id: obj.ID,
-                userId: obj.AuthorID,
-                username: obj.AuthorName,
-                url: obj.Url,
-                createdAt: obj.CreatedAt,
-                title: obj.Title,
-                description: obj.Description,
-                tags: obj.Tags
-            });
+/**
+ * Get all posts, up to an optional limit
+ * @param {number} [limit=-1] - How many posts to return
+ */
+exports.getAllPosts = (limit = -1) => new Promise(async (resolve, reject) => {
+    try {
+        const rows = await db.prepare("SELECT * FROM Posts LIMIT ?").all(limit);
+        return resolve(rows.reverse().map(utils.toClientStructure));
+    } catch (e) {
+        return reject(e);
+    }
+});
+
+/**
+ * Get all posts from a user, up to an optional limit
+ * @param {string|number} userId
+ * @param {number} [limit=-1]
+ */
+exports.getAllPostsFromUser = (userId, limit = -1) => new Promise(async (resolve, reject) => {
+    try {
+        const rows = db.prepare("SELECT * FROM Posts WHERE AuthorID=? LIMIT ?").all(userId, limit);
+        return resolve(rows.reverse().map(utils.toClientStructure));
+    } catch (e) {
+        return reject(e);
+    }
+});
+
+/**
+ * Update a post in the database
+ * @param {string|number} postId - ID of post to update
+ * @param {string} [title] - New post title
+ * @param {string} [description] - New post description
+ * @param {string} [tags] - New post tags as a comma-separated string
+ */
+exports.updatePost = (postId, title, description, tags) => new Promise(async (resolve, reject) => {
+    try {
+        const row = db.prepare("SELECT * FROM Posts WHERE ID=?").get(postId);
+        if (!row) {
+            return resolve(false);
         }
-        if (callback && callback instanceof Function) callback(true, result);
-    } else if (callback && callback instanceof Function) callback(false);
-};
-
-exports.updatePost = (postId, title, description, tags, callback) => {
-    const row = db.prepare("SELECT * FROM Posts WHERE ID=?").get(postId);
-
-    if (row) {
         const result = db.prepare("UPDATE Posts SET Title=?,Description=?,Tags=? WHERE ID=?").run(
             (title ? title : row.Title),
             (description ? description : row.Description),
             (tags ? tags : row.Tags),
             postId
         );
-
-        if (callback && callback instanceof Function) callback(!!(result), result.changes);
-    } else {
-        if (callback && callback instanceof Function) callback(false);
+        
+        return resolve(result.changes > 0);
+    } catch (e) {
+        return reject(e);
     }
-};
+});
 
-exports.deletePost = (postId, callback) => {
-    // delete image somehow
-
-    const result = db.prepare("DELETE FROM Posts WHERE ID=?").run(postId);
-
-    if (callback && callback instanceof Function) callback(!!(result));
-};
+/**
+ * Delete a post from the database
+ * @param {string|number} postId - ID of post to remove
+ */
+exports.deletePost = (postId) => new Promise(async (resolve, reject) => {
+    try {
+        const result = db.prepare("DELETE FROM Posts WHERE ID=?").run(postId);
+        return resolve(result.changes > 0);
+    } catch (e) {
+        return reject(e);
+    }
+});
