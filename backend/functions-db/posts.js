@@ -1,4 +1,5 @@
 const sql = require("./db-init.js");
+const utils = require("../utils/posts");
 const db = sql.getDb();
 
 exports.createPost = (image, title, description, tags, userName, userId, callback) => {
@@ -8,7 +9,7 @@ exports.createPost = (image, title, description, tags, userName, userId, callbac
     }
 
     // upload image somehow
-    const url = typeof(image) === "string" ? image : "testStringPlsFix";
+    const url = typeof image === "string" ? image : "testStringPlsFix";
 
     title = title ? title : "";
     description = description ? description : "";
@@ -48,30 +49,14 @@ exports.getPost = (postId, callback) => {
     } else if (callback && callback instanceof Function) callback(false);
 };
 
-exports.getAllPosts = (limit, callback) => {
-    const rows = db.prepare("SELECT * FROM Posts").all();
-
-    if (rows) {
-        let result = [];
-        for (let i = rows.length - 1; i >= 0; --i) {
-            if (limit && limit > 0)
-                if (result.length >= limit)
-                    break;
-            let obj = rows[i];
-            result.push({
-                id: obj.ID,
-                userId: obj.AuthorID,
-                username: obj.AuthorName,
-                url: obj.Url,
-                createdAt: obj.CreatedAt,
-                title: obj.Title,
-                description: obj.Description,
-                tags: obj.Tags
-            });
-        }
-        if (callback && callback instanceof Function) callback(true, result);
-    } else if (callback && callback instanceof Function) callback(false);
-};
+exports.getAllPosts = (limit = -1) => new Promise(async (resolve, reject) => {
+    try {
+        const rows = await db.prepare("SELECT * FROM Posts LIMIT ?").all(limit);
+        return resolve(rows.map(utils.toClientStructure));
+    } catch (e) {
+        return reject(e);
+    }
+});
 
 exports.getAllPostsFromUser = (userId, callback) => {
     const rows = db.prepare("SELECT * FROM Posts WHERE AuthorID=?").all(userId);
