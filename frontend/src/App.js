@@ -48,6 +48,40 @@ const loginInput = {
   borderColor: "#e6e6e6",
 }
 
+const profileStyle = {
+  margin: "80px auto 40px auto"
+}
+
+const flexItem = {
+  padding: "3px 7px",
+  margin: "5px 20px" ,
+  border: "1px solid #e6e6e6",
+  background: "#fff",
+  borderRadius: 3,
+};
+const profileButton = {
+  margin: 12,
+  width: "30%",
+  height: 40,
+  background: "white",
+  borderWidth: 0,
+  borderTopWidth: 1}
+
+  const postItem = {
+    width: "33.33%",
+    border: "solid 1px #e6e6e6",
+    borderTopWidth: 0,
+    borderBottomWidht: 0,
+  }
+  const postItemText = {
+    margin: 8
+  }
+  const loginDiv = {
+    height: "100%",
+    position: "relative",
+    height: 800
+  }
+  
 class App extends Component {
   constructor(props) {
     super(props);
@@ -95,7 +129,6 @@ class App extends Component {
     if (!this.state.id) {
       axios.get("http://localhost:3002/posts?limit=" + this.state.postCount)
       .then((response) => {
-        console.log(response.data.posts);
         this.setState({
           posts: response.data.posts
         });
@@ -150,22 +183,6 @@ class App extends Component {
     );
   }
 }
-
-const flexItem = {
-  padding: "3px 7px",
-  margin: "5px 20px" ,
-  border: "1px solid #e6e6e6",
-  background: "#fff",
-  borderRadius: 3,
-};
-const profileButton = {
-  margin: 12,
-width: "30%",
- height: 40,
- background: "white",
- borderWidth: 0,
- borderTopWidth: 1}
-
 class Profile extends Component{
   constructor(props) {
     super(props);
@@ -185,9 +202,6 @@ class Profile extends Component{
   }
 }
 
-const profileStyle = {
-  margin: "80px auto 40px auto"
-}
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -215,7 +229,6 @@ class Login extends Component {
     axios.post("http://localhost:3002/users/auth", qs.stringify({email: email,password: password}))
     .then((res) => {
       if (res.data.success) {
-        console.log(res);
         this.props.sucessFunction(email, "naRandom");
       }else {
         if (res.data.error) {
@@ -242,7 +255,6 @@ class Login extends Component {
     }
     axios.post("http://localhost:3002/users", qs.stringify({email: email,password: password, displayName: username}))
     .then((res) => {
-      console.log(res);
       if (res.data.success) {
         this.props.sucessFunction(email, username, res.data.user.id);
       }else {
@@ -279,11 +291,6 @@ class Login extends Component {
   }
 }
 
-const loginDiv = {
-  height: "100%",
-  position: "relative",
-  height: 800
-}
 
 class Posts extends Component {
   constructor(props) {
@@ -295,7 +302,6 @@ class Posts extends Component {
       <div>
       <Grid>
         <Row className="show-grid">
-        {console.log(this.props.items)}
         {this.props.profile && <Profile newest={this.props.items[0].createdAt} count={this.props.items.length} name={this.props.items[0].username} userClick={this.props.userClick} />}
           {this.props.items.map(post => <Post tags={post.tags} title={post.title} imgUrl={post.url} description={post.description} username={post.username} id={post.userId} createdAt={post.createdAt} userClick={this.props.userClick} />)}
         </Row>
@@ -304,15 +310,6 @@ class Posts extends Component {
       </div>
     );
   }
-}
-const postItem = {
-  width: "33.33%",
-  border: "solid 1px #e6e6e6",
-  borderTopWidth: 0,
-  borderBottomWidht: 0,
-}
-const postItemText = {
-  margin: 8
 }
 class Post extends Component {
   render() {
