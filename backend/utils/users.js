@@ -5,6 +5,6 @@
  */
 exports.toClientStructure = user => ({
     email: user.Email,
-    displayName: user.displayName,
+    displayName: user.DisplayName,
     id: user.ID
 });
