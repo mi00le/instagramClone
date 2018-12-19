@@ -2,8 +2,6 @@ const sql = require("./db-init.js");
 const utils = require("../utils/users");
 const db = sql.getDb();
 
-const tokenUtils = require("../utils/tokens");
-
 const crypto = require("crypto");
 
 /**
@@ -45,6 +43,8 @@ var encryptPass = (password, salt) => {
  */
 exports.authenticateUser = (email, password) => new Promise(async (resolve, reject) => {
     try {
+        if (!email) email = "";
+        if (!password) password = "";
         const row = db.prepare("SELECT * FROM Users WHERE Email=?").get(email);
     
         let pass;
@@ -118,18 +118,10 @@ exports.createUser = (email, password, displayName) => new Promise(async (resolv
 
             const uid = result.lastInsertRowid;
 
-            const token = jwt.sign({
-                userId: uid,
-                email: email
-            }, tokenUtils.options.secret, {
-                expiresIn: tokenUtils.options.tokenLifetime
-            });
-
             return resolve({ success: true, user: {
                 email: email,
                 displayName: displayName,
-                id: uid,
-                token: token
+                id: uid
             }});
         }
     } catch (e) {

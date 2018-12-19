@@ -22,10 +22,14 @@ app.route("/users").get(async (req, res) => {
     }
 }).post(async (req, res) => {
     try {
-        const user = await dbUsers.createUser(req.body.email, req.body.password, req.body.displayName);
-        res.json({ user });
+        const data = await dbUsers.createUser(req.body.email, req.body.password, req.body.displayName);
+        if (data.success) {
+            const token = jwt.createToken(data.user.id, data.user.email);
+            res.json({ data, token });
+        } else {
+            res.json({ data });
+        }
     } catch (e) {
-        console.log(e);
         res.status(500).send("Internal error");
     }
 });
@@ -33,8 +37,12 @@ app.route("/users").get(async (req, res) => {
 app.route("/users/auth").post(async (req, res) => {
     try {
         const auth = await dbUsers.authenticateUser(req.body.email, req.body.password);
-        const token = jwt.createToken(auth.user.id, auth.user.email);
-        res.json({ auth: auth.success, token: token });
+        if (auth.success) {
+            const token = jwt.createToken(auth.user.id, auth.user.email);
+            res.json({ auth, token });
+        } else {
+            res.json({ auth });
+        }
     } catch (e) {
         res.status(500).send("Internal error");
     }
@@ -93,7 +101,6 @@ app.use((req, res, next) => {
             res.status(403).send("No token provided");
         }
     } catch (e) {
-        console.log(e);
         res.status(500).send("Internal error");
     }
 });
@@ -112,7 +119,6 @@ const verifyUser = (req, res, next) => {
             res.status(403).json({ message: "Invalid user", id: "invalidUser" });
         }
     } catch (e) {
-        console.log(e);
         res.status(500).send("Internal error");
     }
 };
@@ -142,7 +148,6 @@ app.route("/posts/:userId/:postId").post(async (req, res) => {
         const result = await dbPosts.deletePost(req.params.postId);
         res.json({ result });
     } catch (e) {
-        console.log(e);
         res.status(500).send("Internal error");
     }
 });
