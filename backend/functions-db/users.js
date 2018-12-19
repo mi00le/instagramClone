@@ -97,7 +97,7 @@ exports.getAllUsers = (limit = -1) => new Promise(async (resolve, reject) => {
  */
 exports.createUser = (email, password, displayName) => new Promise(async (resolve, reject) => {
     try {
-        if (!email || !password || !displayName) return resolve(false, {message: "Missing params", id:"missingParams"});
+        if (!email || !password || !displayName) return resolve({ success: false, err: {message: "Missing params", id:"missingParams"} });
 
         let pass = encryptPass(password);
 
