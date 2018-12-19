@@ -3,7 +3,8 @@ CREATE TABLE `Users` (
     `Email` TEXT NOT NULL UNIQUE,
     `Password` TEXT NOT NULL,
     `Salt` TEXT NOT NULL,
-    `DisplayName` TEXT NOT NULL UNIQUE
+    `DisplayName` TEXT NOT NULL UNIQUE,
+    `Token` TEXT
 );
 
 CREATE TABLE `Posts` (
