@@ -1,5 +1,4 @@
-module.exports = {
-  timeSince : function (date) {
+export const timeSince =  (date) => {
     var seconds = Math.floor((new Date() - date) / 1000);
     var interval = Math.floor(seconds / 31536000);
 
@@ -23,6 +22,4 @@ module.exports = {
       return interval + " minutes";
     }
     return Math.floor(seconds) + " seconds";
-  },
-  
-}
+  }
