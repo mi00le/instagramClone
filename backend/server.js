@@ -25,6 +25,7 @@ app.route("/users").get(async (req, res) => {
         const user = await dbUsers.createUser(req.body.email, req.body.password, req.body.displayName);
         res.json({ user });
     } catch (e) {
+        console.log(e);
         res.status(500).send("Internal error");
     }
 });
@@ -48,12 +49,12 @@ app.route("/users/:userId").get(async (req, res) => {
     }
 });
 
-app.route("/posts").get(async (req, res) => {
+app.route("/posts/:userId/:postId").get(async (req, res) => {
     try {
-        const posts = await dbPosts.getAllPosts(req.query.limit);
-        res.json({ posts });
+        const post = await dbPosts.getPost(req.params.postId);
+        res.json({ post });
     } catch (e) {
-        res.status(500).send("Something broke!");
+        res.status(500).send("Internal error");
     }
 });
 
@@ -66,12 +67,12 @@ app.route("/posts/:userId").get(async (req, res) => {
     }
 });
 
-app.route("/posts/:userId/:postId").get(async (req, res) => {
+app.route("/posts").get(async (req, res) => {
     try {
-        const post = await dbPosts.getPost(req.params.postId);
-        res.json({ post });
+        const posts = await dbPosts.getAllPosts(req.query.limit);
+        res.json({ posts });
     } catch (e) {
-        res.status(500).send("Internal error");
+        res.status(500).send("Something broke!");
     }
 });
 
@@ -92,23 +93,38 @@ app.use((req, res, next) => {
             res.status(403).send("No token provided");
         }
     } catch (e) {
+        console.log(e);
         res.status(500).send("Internal error");
     }
 });
+
+const verifyUser = (req, res, next) => {
+    try {
+        let uid = req.params.userId || req.body.userId || req.query.userId;
+
+        if (typeof(req.decoded.userId) === "number") {
+            uid = parseInt(uid, 10);
+        }
+
+        if (req.decoded.userId === uid) {
+            next();
+        } else {
+            res.status(403).json({ message: "Invalid user", id: "invalidUser" });
+        }
+    } catch (e) {
+        console.log(e);
+        res.status(500).send("Internal error");
+    }
+};
+
+app.use("/users/:userId", verifyUser);
+app.use("/posts/:userId", verifyUser);
+app.use("/posts/:userId/:postId", verifyUser);
 
 app.route("/users/:userId").delete(async (req, res) => {
     try {
         const result = await dbUsers.deleteUser(req.params.userId);
         res.json({ result });
-    } catch (e) {
-        res.status(500).send("Internal error");
-    }
-});
-
-app.route("/posts/:userId").post(async (req, res) => {
-    try {
-        const post = await dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId);
-        res.json({ post });
     } catch (e) {
         res.status(500).send("Internal error");
     }
@@ -125,6 +141,16 @@ app.route("/posts/:userId/:postId").post(async (req, res) => {
     try {
         const result = await dbPosts.deletePost(req.params.postId);
         res.json({ result });
+    } catch (e) {
+        console.log(e);
+        res.status(500).send("Internal error");
+    }
+});
+
+app.route("/posts/:userId").post(async (req, res) => {
+    try {
+        const post = await dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId);
+        res.json({ post });
     } catch (e) {
         res.status(500).send("Internal error");
     }

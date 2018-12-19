@@ -105,11 +105,11 @@ exports.createUser = (email, password, displayName) => new Promise(async (resolv
 
         if (row) {
             if (row.Email === email) {
-                return resolve(false, { message: "Email taken", id: "inUseEmail" });
+                return resolve({ success: false, err: { message: "Email taken", id: "inUseEmail" } });
             } else if (row.DisplayName === displayName) {
-                return resolve(false, { message: "Name taken", id: "inUseName" });
+                return resolve({ success: false, err: { message: "Name taken", id: "inUseName" } });
             } else {
-                return resolve(false, { message: "Unknown error", id: "unknownError" });
+                return resolve({ success: false, err: { message: "Unknown error", id: "unknownError" } });
             }
         } else {
             const result = db.prepare("INSERT INTO Users(Email, Password, Salt, DisplayName) VALUES(?, ?, ?, ?)").run(
@@ -125,12 +125,12 @@ exports.createUser = (email, password, displayName) => new Promise(async (resolv
                 expiresIn: tokenUtils.options.tokenLifetime
             });
 
-            return resolve(true, {
+            return resolve({ success: true, user: {
                 email: email,
                 displayName: displayName,
                 id: uid,
                 token: token
-            });
+            }});
         }
     } catch (e) {
         return reject(e);
