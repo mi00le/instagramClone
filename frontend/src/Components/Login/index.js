@@ -56,10 +56,11 @@ export default class Login extends Component {
     const password = document.getElementById('password').value
     axios.post("http://localhost:3002/users/auth", qs.stringify({email: email,password: password}))
     .then((res) => {
-        if (!res.data.auth){throw new Error("Email or Password is incorrect!")};
-        this.props.sucessFunction(email, "naRandom");
+      console.log(res);
+        if (!res.data.auth.success){throw new Error(res.data.auth.err.message)};
+        this.props.sucessFunction(email, res.data.auth.user.displayName, res.data.auth.user.id, res.data.auth.token);
     }).catch((err) => {
-        console.log(err.message);
+        console.log(err);
         this.setState({
           errorMsg: err.message,
           register: false
@@ -82,8 +83,8 @@ export default class Login extends Component {
     axios.post("http://localhost:3002/users", qs.stringify({email: email,password: password, displayName: username}))
     .then((res) => {
       console.log(res);
-      if(!res.data.user){throw new Error("Backend send error msg PLZ")}; // Väntar på tonis pull request så jag kan fixa error msg
-      this.props.sucessFunction(email, username, res.data.user.id);
+      if(!res.data.data.success){throw new Error(res.data.data.err.message)};
+      this.props.sucessFunction(email, username, res.data.data.user.id);
     }).catch((err) => {
         this.setState({
           errorMsg: err.message,

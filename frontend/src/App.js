@@ -44,7 +44,7 @@ class App extends Component {
     const d = document.querySelector("#desc");
     const tag = document.querySelector("#tags");
 
-    axios.post("http://localhost:3002/posts/" + this.state.userId, qs.stringify({image: u.value, title: t.value, description: d.value, username: this.state.username, tags: tag.value}))
+    axios.post("http://localhost:3002/posts/" + this.state.userId , qs.stringify({image: u.value, title: t.value, description: d.value, username: this.state.username, tags: tag.value}))
     .then((res) => {
       if (res.data.post) {
         this.setState({posts: [res.data.post, ...this.state.posts]});
@@ -79,7 +79,7 @@ class App extends Component {
     });
   }
 
-  login(email, username, id) {
+  login(email, username, id, token) {
     this.setState({
       username: username,
       userId: id
@@ -87,6 +87,7 @@ class App extends Component {
     localStorage.setItem("email", email);
     localStorage.setItem("username", username);
     localStorage.setItem("id", id);
+    localStorage.setItem("token", token);
   }
 
   userClick(id){
