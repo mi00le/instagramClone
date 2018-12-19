@@ -2,6 +2,8 @@ const sql = require("./db-init.js");
 const utils = require("../utils/users");
 const db = sql.getDb();
 
+const tokenUtils = require("../utils/tokens");
+
 const crypto = require("crypto");
 
 /**
@@ -51,11 +53,11 @@ exports.authenticateUser = (email, password) => new Promise(async (resolve, reje
             if (row.Password === pass.hash) {
                 // log user in
     
-                return resolve(true);
+                return resolve({ success: true, user: utils.toClientStructure(row) });
             }
         }
         pass = encryptPass(password); // spoof hashing time even if no user was found
-        return resolve(false, {message: "Invalid auth", id: "badAuth"});
+        return resolve({ success: false, err: { message: "Invalid auth", id: "badAuth" } });
     } catch (e) {
         return reject(e);
     }
@@ -114,10 +116,20 @@ exports.createUser = (email, password, displayName) => new Promise(async (resolv
                 email, pass.hash, pass.salt, displayName
             );
 
+            const uid = result.lastInsertRowid;
+
+            const token = jwt.sign({
+                userId: uid,
+                email: email
+            }, tokenUtils.options.secret, {
+                expiresIn: tokenUtils.options.tokenLifetime
+            });
+
             return resolve(true, {
                 email: email,
                 displayName: displayName,
-                id: result.lastInsertRowid
+                id: uid,
+                token: token
             });
         }
     } catch (e) {

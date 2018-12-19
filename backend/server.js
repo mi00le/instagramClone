@@ -4,6 +4,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const dbUsers = require("./functions-db/users.js");
 const dbPosts = require("./functions-db/posts.js");
+const jwt = require("./utils/tokens");
 
 const cors = require("cors");
 
@@ -31,7 +32,8 @@ app.route("/users").get(async (req, res) => {
 app.route("/users/auth").post(async (req, res) => {
     try {
         const auth = await dbUsers.authenticateUser(req.body.email, req.body.password);
-        res.json({ auth });
+        const token = jwt.createToken(auth.user.id, auth.user.email);
+        res.json({ auth: auth.success, token: token });
     } catch (e) {
         res.status(500).send("Internal error");
     }
@@ -41,13 +43,6 @@ app.route("/users/:userId").get(async (req, res) => {
     try {
         const user = await dbUsers.getUser(req.params.userId);
         res.json({ user });
-    } catch (e) {
-        res.status(500).send("Internal error");
-    }
-}).delete(async (req, res) => {
-    try {
-        const result = dbUsers.deleteUser(req.params.userId);
-        res.json({ result });
     } catch (e) {
         res.status(500).send("Internal error");
     }
@@ -69,13 +64,6 @@ app.route("/posts/:userId").get(async (req, res) => {
     } catch (e) {
         res.status(500).send("Internal error");
     }
-}).post(async (req, res) => {
-    try {
-        const post = dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId);
-        res.json({ post });
-    } catch (e) {
-        res.status(500).send("Internal error");
-    }
 });
 
 app.route("/posts/:userId/:postId").get(async (req, res) => {
@@ -85,23 +73,64 @@ app.route("/posts/:userId/:postId").get(async (req, res) => {
     } catch (e) {
         res.status(500).send("Internal error");
     }
-}).post(async (req, res) => {
+});
+
+app.use((req, res, next) => {
     try {
-        const result = dbPosts.updatePost(req.params.postId, req.body.title, req.body.description, req.body.tags);
-        res.json({ result });
+        const token = req.body.token || req.query.token || req.headers["x-access-token"];
+
+        if (token) {
+            jwt.jwt.verify(token, jwt.options.secret, (err, decoded) => {
+                if (err) {
+                    return res.status(403).send("Invalid token");
+                } else {
+                    req.decoded = decoded;
+                    next();
+                }
+            });
+        } else {
+            res.status(403).send("No token provided");
+        }
     } catch (e) {
         res.status(500).send("Internal error");
     }
-}).delete(async (req, res) => {
+});
+
+app.route("/users/:userId").delete(async (req, res) => {
     try {
-        const result = dbPosts.deletePost(req.params.postId);
+        const result = await dbUsers.deleteUser(req.params.userId);
         res.json({ result });
     } catch (e) {
         res.status(500).send("Internal error");
     }
 });
 
-app.use(async (req, res) => {
+app.route("/posts/:userId").post(async (req, res) => {
+    try {
+        const post = await dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId);
+        res.json({ post });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+});
+
+app.route("/posts/:userId/:postId").post(async (req, res) => {
+    try {
+        const result = await dbPosts.updatePost(req.params.postId, req.body.title, req.body.description, req.body.tags);
+        res.json({ result });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+}).delete(async (req, res) => {
+    try {
+        const result = await dbPosts.deletePost(req.params.postId);
+        res.json({ result });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+});
+
+app.use((req, res) => {
     res.status(404).send(req.originalUrl + " not found");
 });
 
