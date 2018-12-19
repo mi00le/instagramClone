@@ -56,11 +56,9 @@ export default class Login extends Component {
     const password = document.getElementById('password').value
     axios.post("http://localhost:3002/users/auth", qs.stringify({email: email,password: password}))
     .then((res) => {
-      console.log(res);
         if (!res.data.auth.success){throw new Error(res.data.auth.err.message)};
-        this.props.sucessFunction(email, res.data.auth.user.displayName, res.data.auth.user.id, res.data.auth.token);
+        this.props.sucessFunction(email, res.data.auth.user.displayName, res.data.auth.user.id, res.data.token);
     }).catch((err) => {
-        console.log(err);
         this.setState({
           errorMsg: err.message,
           register: false
@@ -82,9 +80,8 @@ export default class Login extends Component {
     }
     axios.post("http://localhost:3002/users", qs.stringify({email: email,password: password, displayName: username}))
     .then((res) => {
-      console.log(res);
       if(!res.data.data.success){throw new Error(res.data.data.err.message)};
-      this.props.sucessFunction(email, username, res.data.data.user.id);
+      this.props.sucessFunction(email, username, res.data.data.user.id, res.data.token);
     }).catch((err) => {
         this.setState({
           errorMsg: err.message,

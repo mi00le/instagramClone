@@ -44,6 +44,7 @@ class App extends Component {
     const d = document.querySelector("#desc");
     const tag = document.querySelector("#tags");
 
+    axios.defaults.headers.common['x-access-token'] = localStorage.getItem("token");
     axios.post("http://localhost:3002/posts/" + this.state.userId , qs.stringify({image: u.value, title: t.value, description: d.value, username: this.state.username, tags: tag.value}))
     .then((res) => {
       if (res.data.post) {
