@@ -23,7 +23,7 @@ export default class Navbar extends React.Component {
   handleChange(tags) {
     this.setState({ tags });
   }
-  
+
   handleChangeInput(tag) {
     if(tag.length <= tagLength){
       this.setState({ tag });
