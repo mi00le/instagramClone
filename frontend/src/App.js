@@ -58,11 +58,8 @@ class App extends Component {
     let tagArr = [];
     for(let i = 0; i < a.length; i++){
       tagArr.push(a[i].innerText);
-      console.log(tagArr);
     }
-    console.log(tagArr);
     tagArr = JSON.stringify(tagArr);
-    console.log(tagArr);
 
     axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: tagArr}))
     .then((res) => {
