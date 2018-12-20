@@ -193,6 +193,14 @@ label {
   margin-top: 6px;
 }
 
+.react-tagsinput > span > input[type=text]{
+  border:none;
+}
+.react-tagsinput-tag{
+  float: left;
+
+}
+
 /* Clear floats after the columns */
 .row:after {
   content: "";

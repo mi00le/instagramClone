@@ -2,12 +2,33 @@ import React from "react";
 import "./navbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
+// import Tags from "../../Components/Tags/index.js";
 
 import Popup from "reactjs-popup";
+import TagsInput from "react-tagsinput";
+import "react-tagsinput/react-tagsinput.css";
 
 import { Grid, Row, Col, Navbar as BSNavbar } from "react-bootstrap";
 
+const tagLength = 10;
+
 export default class Navbar extends React.Component {
+  constructor() {
+    super();
+    this.state = { tags: [], tag: "" };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleChangeInput = this.handleChangeInput.bind(this);
+  }
+
+  handleChange(tags) {
+    this.setState({ tags });
+  }
+  
+  handleChangeInput(tag) {
+    if(tag.length <= tagLength){
+      this.setState({ tag });
+    }
+  }
   render() {
     return (
       <BSNavbar fixedTop collapseOnSelect className="navbar-main">
@@ -59,11 +80,12 @@ export default class Navbar extends React.Component {
                       <label>Tags</label>
                     </div>
                     <div className="col-75">
-                      <input
-                        type="text"
-                        id="tags"
-                        className="form-control"
-                        placeholder="Enter tags.."
+                      <TagsInput
+                        maxTags="3"
+                        value={this.state.tags}
+                        onChange={this.handleChange.bind(this)}
+                        inputValue={this.state.tag}
+                        onChangeInput={this.handleChangeInput.bind(this)}
                       />
                     </div>
                   </div>
@@ -85,7 +107,7 @@ export default class Navbar extends React.Component {
                     <button
                       id="btn"
                       className="form-control btn-primary"
-                      onClick={this.props.handler} 
+                      onClick={this.props.handler}
                     >
                       Upload
                     </button>

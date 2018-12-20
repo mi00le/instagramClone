@@ -52,7 +52,19 @@ class App extends Component {
     let t = document.querySelector("#title");
     let d = document.querySelector("#desc");
 
-    axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: {}}))
+
+    let a = document.querySelectorAll('.react-tagsinput-tag');
+
+    let tagArr = [];
+    for(let i = 0; i < a.length; i++){
+      tagArr.push(a[i].innerText);
+      console.log(tagArr);
+    }
+    console.log(tagArr);
+    tagArr = JSON.stringify(tagArr);
+    console.log(tagArr);
+
+    axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: tagArr}))
     .then((res) => {
       if (res.data.post) {
         this.setState({posts: [res.data.post, ...this.state.posts]});
@@ -76,7 +88,7 @@ class App extends Component {
       <div className="App">
         <header>
         </header>
-        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
+        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} handleChange={this.state.tags}/>
         <Posts items={this.state.posts} />
       </div>
     );
@@ -92,7 +104,7 @@ class Posts extends Component {
     return (
       <Grid>
         <Row className="show-grid">
-          {this.props.items.map(post => <Post title={post.title} imgUrl={post.url} description={post.description} username={post.username} createdAt={post.createdAt} />)}
+          {this.props.items.map(post => <Post title={post.title} imgUrl={post.url} description={post.description} username={post.username} createdAt={post.createdAt} tags={post.tags}/>)}
         </Row>
       </Grid>
     );
@@ -107,6 +119,7 @@ class Post extends Component {
         <img style={imgStyle} src={this.props.imgUrl} />
         <div style={{width: "70%", margin: "0 auto"}}>
         <p style={{margin: 10}}>{this.props.description}</p>
+        <p>{this.props.tags}</p>
         </div>
         <hr style={{margin: 0}}/>
         <div style={{width: "70%", margin: "0 auto"}}>
