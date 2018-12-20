@@ -68,7 +68,7 @@ app.route("/posts/:userId/:postId").get(async (req, res) => {
 
 app.route("/posts/:userId").get(async (req, res) => {
     try {
-        const posts = await dbPosts.getAllPostsFromUser(req.params.userId, req.query.limit);
+        const posts = await dbPosts.getAllPostsFromUser(req.params.userId, req.query.limit, req.query.tag);
         res.json({ posts });
     } catch (e) {
         res.status(500).send("Internal error");
@@ -77,9 +77,10 @@ app.route("/posts/:userId").get(async (req, res) => {
 
 app.route("/posts").get(async (req, res) => {
     try {
-        const posts = await dbPosts.getAllPosts(req.query.limit);
+        const posts = await dbPosts.getAllPosts(req.query.limit, req.query.tag);
         res.json({ posts });
     } catch (e) {
+        console.log(e);
         res.status(500).send("Something broke!");
     }
 });

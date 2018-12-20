@@ -57,10 +57,12 @@ exports.getPost = (postId) => new Promise(async (resolve, reject) => {
 /**
  * Get all posts, up to an optional limit
  * @param {number} [limit=-1] - How many posts to return
+ * @param {string} [tag]
  */
-exports.getAllPosts = (limit = -1) => new Promise(async (resolve, reject) => {
+exports.getAllPosts = (limit = -1, tag) => new Promise(async (resolve, reject) => {
     try {
-        const rows = await db.prepare("SELECT * FROM Posts").all();
+        if (!tag) tag = "";
+        const rows = await db.prepare("SELECT * FROM Posts WHERE instr(Tags, ?)").all(tag);
         return resolve(rows.reverse().slice(0, limit < 0 ? rows.length : limit).map(utils.toClientStructure));
     } catch (e) {
         return reject(e);
@@ -71,10 +73,12 @@ exports.getAllPosts = (limit = -1) => new Promise(async (resolve, reject) => {
  * Get all posts from a user, up to an optional limit
  * @param {string|number} userId
  * @param {number} [limit=-1]
+ * @param {string} [tag]
  */
-exports.getAllPostsFromUser = (userId, limit = -1) => new Promise(async (resolve, reject) => {
+exports.getAllPostsFromUser = (userId, limit = -1, tag) => new Promise(async (resolve, reject) => {
     try {
-        const rows = db.prepare("SELECT * FROM Posts WHERE AuthorID=?").all(userId);
+        if (!tag) tag = "";
+        const rows = db.prepare("SELECT * FROM Posts WHERE AuthorID=? AND instr(Tags, ?)").all(userId, tag);
         return resolve(rows.reverse().slice(0, limit < 0 ? rows.length : limit).map(utils.toClientStructure));
     } catch (e) {
         return reject(e);

@@ -101,7 +101,15 @@ exports.createUser = (email, password, displayName) => new Promise(async (resolv
 
         let pass = encryptPass(password);
 
-        const row = db.prepare("SELECT * FROM Users WHERE Email=? OR DisplayName=?").get(email, displayName);
+        const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i;
+
+        if (!emailRegex.test(email)) return resolve({ success: false, err: { message: "Invalid email address", id: "malformedEmail" } });
+
+        const nameRegex = /^[A-Za-z0-9\._-]$/;
+
+        if (!nameRegex.test(displayName)) return resolve({ success: false, err: { message: "Invalid display name (Alphanumeric and .-_ only)", id: "malformedName" } });
+
+        const row = db.prepare("SELECT * FROM Users WHERE Email LIKE ? OR DisplayName=?").get(email, displayName);
 
         if (row) {
             if (row.Email === email) {
