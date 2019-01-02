@@ -63,7 +63,7 @@ exports.getAllPosts = (limit = -1, tag) => new Promise(async (resolve, reject) =
     try {
         if (!tag) tag = "";
         const rows = await db.prepare("SELECT * FROM Posts WHERE instr(Tags, ?)").all(tag);
-        return resolve(rows.reverse().slice(0, limit < 0 ? rows.length : limit).map(utils.toClientStructure));
+        return resolve(rows ? rows.reverse().slice(0, limit < 0 ? rows.length : limit).map(utils.toClientStructure) : []);
     } catch (e) {
         return reject(e);
     }
@@ -79,7 +79,7 @@ exports.getAllPostsFromUser = (userId, limit = -1, tag) => new Promise(async (re
     try {
         if (!tag) tag = "";
         const rows = db.prepare("SELECT * FROM Posts WHERE AuthorID=? AND instr(Tags, ?)").all(userId, tag);
-        return resolve(rows.reverse().slice(0, limit < 0 ? rows.length : limit).map(utils.toClientStructure));
+        return resolve(rows ? rows.reverse().slice(0, limit < 0 ? rows.length : limit).map(utils.toClientStructure) : []);
     } catch (e) {
         return reject(e);
     }

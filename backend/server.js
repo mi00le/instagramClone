@@ -13,14 +13,7 @@ app.use(cors());
 
 const port = process.env.PORT || 3002;
 
-app.route("/users").get(async (req, res) => {
-    try {
-        const users = await dbUsers.getAllUsers(req.query.limit);
-        res.json({ users });
-    } catch (e) {
-        res.status(500).send("Internal error");
-    }
-}).post(async (req, res) => {
+app.route("/users").post(async (req, res) => {
     try {
         const data = await dbUsers.createUser(req.body.email, req.body.password, req.body.displayName);
         if (data.success) {
@@ -127,6 +120,15 @@ const verifyUser = (req, res, next) => {
 app.use("/users/:userId", verifyUser);
 app.use("/posts/:userId", verifyUser);
 app.use("/posts/:userId/:postId", verifyUser);
+
+app.route("/users").get(async (req, res) => {
+    try {
+        const users = await dbUsers.getAllUsers(req.query.limit);
+        res.json({ users });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+});
 
 app.route("/users/:userId").delete(async (req, res) => {
     try {

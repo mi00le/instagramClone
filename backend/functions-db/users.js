@@ -83,7 +83,7 @@ exports.getUser = (userId) => new Promise(async (resolve, reject) => {
 exports.getAllUsers = (limit = -1) => new Promise(async (resolve, reject) => {
     try {
         const rows = db.prepare("SELECT * FROM Users LIMIT ?").get(limit);
-        return resolve(rows.map(utils.toClientStructure));
+        return resolve(rows ? rows.map(utils.toClientStructure) : []);
     } catch (e) {
         return reject(e);
     }
