@@ -36,6 +36,8 @@ var encryptPass = (password, salt) => {
     };
 };
 
+exports.encryptPass = encryptPass;
+
 /**
  * Verify if user email and password are correct
  * @param {string} email
