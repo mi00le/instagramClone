@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const server = require("../server");
@@ -85,4 +87,63 @@ describe("Users", () => {
                 });
         });
     });*/
+
+    describe("/POST users/auth", () => {
+        it("it should 403, invalid credentials", (done) => {
+            chai.request(server).post("/users/auth")
+                .set("content-type", "application/x-www-form-urlencoded")
+                .send({email: "AAAAAAAAA", password: "no"})
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    done();
+                });
+        });
+
+        it("it should 403, no credentials", (done) => {
+            chai.request(server).post("/users/auth")
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    done();
+                });
+        });
+
+        it("it should 403, no email, only password", (done) => {
+            chai.request(server).post("/users/auth")
+                .set("content-type", "application/x-www-form-urlencoded")
+                .send({password: "no"})
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    done();
+                });
+        });
+
+        it("it should 403, no password, only email", (done) => {
+            chai.request(server).post("/users/auth")
+                .set("content-type", "application/x-www-form-urlencoded")
+                .send({email: "AAAAAAAAA"})
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    done();
+                });
+        });
+
+        it("it should 200, return token and user, valid creds", (done) => {
+            chai.request(server).post("/users/auth")
+                .set("content-type", "application/x-www-form-urlencoded")
+                .send({email: username, password: password})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property("auth");
+                    res.body.auth.should.have.property("user");
+                    res.body.auth.user.should.have.property("id");
+                    uid = res.body.auth.user.id;
+                    res.body.should.have.property("token");
+                    token = res.body.token;
+                    done();
+                });
+        });
+    });
 });
+
+/* eslint-enable */
+

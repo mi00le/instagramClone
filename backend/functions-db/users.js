@@ -106,7 +106,7 @@ exports.createUser = (email, password, displayName) => new Promise(async (resolv
 
         if (!emailRegex.test(email)) return resolve({ success: false, err: { message: "Invalid email address", id: "malformedEmail" } });
 
-        const nameRegex = /^[A-Za-z0-9\._-]+$/;
+        const nameRegex = /^[A-Za-z0-9._-]+$/;
 
         if (!nameRegex.test(displayName)) return resolve({ success: false, err: { message: "Invalid display name (Alphanumeric and .-_ only)", id: "malformedName" } });
 

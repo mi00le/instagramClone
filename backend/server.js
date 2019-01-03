@@ -73,7 +73,6 @@ app.route("/posts").get(async (req, res) => {
         const posts = await dbPosts.getAllPosts(req.query.limit, req.query.tag);
         res.json({ posts });
     } catch (e) {
-        console.log(e);
         res.status(500).send("Something broke!");
     }
 });
