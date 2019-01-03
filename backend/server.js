@@ -20,7 +20,7 @@ app.route("/users").post(async (req, res) => {
             const token = jwt.createToken(data.user.id, data.user.email);
             res.json({ data, token });
         } else {
-            res.json({ data });
+            res.status(403).json({ data });
         }
     } catch (e) {
         res.status(500).send("Internal error");
@@ -34,7 +34,7 @@ app.route("/users/auth").post(async (req, res) => {
             const token = jwt.createToken(auth.user.id, auth.user.email);
             res.json({ auth, token });
         } else {
-            res.json({ auth });
+            res.status(403).json({ auth });
         }
     } catch (e) {
         res.status(500).send("Internal error");
@@ -172,3 +172,5 @@ app.listen(port, () => {
     /* eslint-disable-next-line no-console */
     console.log("Node listening on port " + port + "...");
 });
+
+module.exports = app;
