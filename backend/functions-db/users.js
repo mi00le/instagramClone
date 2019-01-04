@@ -72,7 +72,7 @@ exports.authenticateUser = (email, password) => new Promise(async (resolve, reje
 exports.getUser = (userId) => new Promise(async (resolve, reject) => {
     try {
         const row = db.prepare("SELECT * FROM Users WHERE ID=?").get(userId);
-        return resolve(utils.toClientStructure(row));
+        return resolve(row ? utils.toClientStructure(row) : null);
     } catch (e) {
         return reject(e);
     }

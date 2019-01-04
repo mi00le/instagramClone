@@ -17,3 +17,4 @@ mDb.prepare("INSERT INTO Posts(AuthorID, AuthorName, Url, CreatedAt, Title, Desc
     .run(1, "test", "test", new Date().getTime(), "test", "test", "test");
 
 stub(db, "getDb").returns(mDb);
+

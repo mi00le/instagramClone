@@ -44,7 +44,8 @@ app.route("/users/auth").post(async (req, res) => {
 app.route("/users/:userId").get(async (req, res) => {
     try {
         const user = await dbUsers.getUser(req.params.userId);
-        res.json({ user });
+        if (user) res.json({ user });
+        else res.status(404).send("User not found");
     } catch (e) {
         res.status(500).send("Internal error");
     }
