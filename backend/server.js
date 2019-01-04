@@ -79,7 +79,8 @@ app.route("/posts").get(async (req, res) => {
 
 app.use((req, res, next) => {
     try {
-        const token = req.body.token || req.query.token || req.headers["x-access-token"];
+        // const token = req.body.token || req.query.token || req.headers["x-access-token"];
+        const token = req.headers.authorization;
 
         if (token) {
             jwt.jwt.verify(token, jwt.options.secret, (err, decoded) => {
