@@ -4,8 +4,9 @@
   "description": "Insta clone backend side",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon",
-    "test": "mocha --file tests/mocks/db tests/**/*.test.js"
+    "dev": "nodemon server.js --exec 'npm run eslint && node'",
+    "test": "mocha --file tests/mocks/db tests/**/*.test.js",
+    "eslint": "eslint ."
   },
   "keywords": [
     "instagram",
