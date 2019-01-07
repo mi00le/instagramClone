@@ -16,16 +16,16 @@ exports.createPost = (image, title, description, tags, userName, userId) => new 
         if (!userId || !userName) {
             return reject();
         }
-    
+
         title = title ? title : "";
         description = description ? description : "";
         tags = tags ? tags : "";
-    
+
         const currentTime = new Date().getTime();
-    
+
         const prep = db.prepare("INSERT INTO Posts(AuthorID, AuthorName, Url, CreatedAt, Title, Description, Tags) VALUES(?, ?, ?, ?, ?, ?, ?)");
         const result = prep.run(userId, userName, image, currentTime, title, description, tags);
-    
+
         return resolve({
             id: result.lastInsertRowid,
             userId: userId,
@@ -60,8 +60,8 @@ exports.getPost = (postId) => new Promise(async (resolve, reject) => {
  */
 exports.getAllPosts = (limit = -1) => new Promise(async (resolve, reject) => {
     try {
-        const rows = await db.prepare("SELECT * FROM Posts LIMIT ?").all(limit);
-        return resolve(rows.reverse().map(utils.toClientStructure));
+        const rows = await db.prepare("SELECT * FROM Posts").all();
+        return resolve(rows.reverse().slice(0, limit < 0 ? row.length : limit).map(utils.toClientStructure));
     } catch (e) {
         return reject(e);
     }
@@ -100,7 +100,7 @@ exports.updatePost = (postId, title, description, tags) => new Promise(async (re
             (tags ? tags : row.Tags),
             postId
         );
-        
+
         return resolve(result.changes > 0);
     } catch (e) {
         return reject(e);

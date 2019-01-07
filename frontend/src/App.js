@@ -8,6 +8,7 @@ import Navbar from "./Components/Navbar/";
 import Login from "./Components/Login/";
 import Posts from "./Components/Posts/";
 
+const deafultPostCount = 5;
 const amountToAdd = 10;
 
 class App extends Component {
@@ -93,7 +94,8 @@ class App extends Component {
 
   userClick(id){
     this.setState({
-      id: id
+      id: id,
+      postCount: deafultPostCount
     }, () => {
       this.refreshPosts();
     });
@@ -106,8 +108,8 @@ class App extends Component {
       <header>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
       </header>
-        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
-        {this.state.username ? <Posts profile={this.state.id} items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} /> }
+        <Navbar user={this.state.username} handler={this.updateInfo} handleLogout={this.checkUser} />
+        {this.state.username ? <Posts itemCount={this.state.id ? this.state.postCount : 0} profile={this.state.id} items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} /> }
       </div>
     );
   }
