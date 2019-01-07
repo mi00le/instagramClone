@@ -4,7 +4,7 @@ import axios from "axios";
 import qs from "qs";
 
 const loginBox = {
-  margin : "200px auto",
+  margin : "auto",
   float: "none",
   borderStyle: "solid",
   borderColor: "#e6e6e6",
@@ -25,9 +25,10 @@ const loginInput = {
   borderColor: "#e6e6e6",
 }
 const loginDiv = {
-    height: "100%",
     position: "relative",
-    height: 800
+    height: "100vh",
+    display: "flex",
+    alignItems: "center",
 }
 
 export default class Login extends Component {
