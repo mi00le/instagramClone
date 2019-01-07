@@ -61,7 +61,7 @@ exports.getPost = (postId) => new Promise(async (resolve, reject) => {
 exports.getAllPosts = (limit = -1) => new Promise(async (resolve, reject) => {
     try {
         const rows = await db.prepare("SELECT * FROM Posts").all();
-        return resolve(rows.reverse().slice(0, limit < 0 ? row.length : limit).map(utils.toClientStructure));
+        return resolve(rows.reverse().slice(0, limit < 0 ? rows.length : limit).map(utils.toClientStructure));
     } catch (e) {
         return reject(e);
     }
@@ -74,8 +74,8 @@ exports.getAllPosts = (limit = -1) => new Promise(async (resolve, reject) => {
  */
 exports.getAllPostsFromUser = (userId, limit = -1) => new Promise(async (resolve, reject) => {
     try {
-        const rows = db.prepare("SELECT * FROM Posts WHERE AuthorID=? LIMIT ?").all(userId, limit);
-        return resolve(rows.reverse().map(utils.toClientStructure));
+        const rows = db.prepare("SELECT * FROM Posts WHERE AuthorID=?").all(userId);
+        return resolve(rows.reverse().slice(0, limit < 0 ? rows.length : limit).map(utils.toClientStructure));
     } catch (e) {
         return reject(e);
     }
