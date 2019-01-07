@@ -10,6 +10,11 @@ const { expect, request } = chai;
 
 describe("User Routes", () => {
     describe("GET /users", () => {
+        it("should fail if not authenticated", async () => {
+            const res = await request(server).get("/users");
+
+            expect(res).to.have.status(403);
+        });
         it("should return users", async () => {
             const res = await withAuth(request(server).get("/users"));
 
