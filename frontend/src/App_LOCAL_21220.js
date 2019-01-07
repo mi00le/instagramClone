@@ -44,16 +44,7 @@ class App extends Component {
     const d = document.querySelector("#desc");
     const tag = document.querySelector("#tags");
 
-
-    let a = document.querySelectorAll('.react-tagsinput-tag');
-
-    let tagArr = [];
-    for(let i = 0; i < a.length; i++){
-      tagArr.push(a[i].innerText);
-    }
-    tagArr = JSON.stringify(tagArr);
-
-    axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: tagArr}))
+    axios.post("http://localhost:3002/posts/" + this.state.userId , qs.stringify({image: u.value, title: t.value, description: d.value, username: this.state.username, tags: tag.value}))
     .then((res) => {
       if (res.data.post) {
         this.setState({posts: [res.data.post, ...this.state.posts]});
@@ -88,6 +79,17 @@ class App extends Component {
     });
   }
 
+  login(email, username, id, token) {
+    this.setState({
+      username: username,
+      userId: id
+    });
+    localStorage.setItem("email", email);
+    localStorage.setItem("username", username);
+    localStorage.setItem("id", id);
+    localStorage.setItem("token", token);
+  }
+
   userClick(id){
     this.setState({
       id: id
@@ -96,17 +98,18 @@ class App extends Component {
     });
   }
 
+
   render() {
     return (
-      <div className="App">
-        <header>
-        </header>
-        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} handleChange={this.state.tags}/>
-        <Posts items={this.state.posts} />
+      <div style={{background: this.state.username ? "#f7f7f7" : "#fff"}} className="App">
+      <header>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+      </header>
+        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
+        {this.state.username ? <Posts profile={this.state.id} items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} /> }
       </div>
     );
   }
-
 }
 
 export default App;

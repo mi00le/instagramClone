@@ -1,103 +1,171 @@
-var express = require('express');
-var app = express();
+const express = require("express");
+const app = express();
 
-var bodyParser = require('body-parser');
-var dbUsers = require('./functions-db/users.js');
-var dbPosts = require('./functions-db/posts.js');
+const bodyParser = require("body-parser");
+const dbUsers = require("./functions-db/users.js");
+const dbPosts = require("./functions-db/posts.js");
+const jwt = require("./utils/tokens");
 
-var cors = require('cors');
+const cors = require("cors");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-var port = process.env.PORT || 3002;
+const port = process.env.PORT || 3002;
 
-app.route("/users").get((req, res) => {
-	dbUsers.getAllUsers((result, users) => {
-		if (result && !!(users)) {
-			res.json({success: true, users: users});
-		} else {
-			res.json({success: false});
-		}
-	});
-}).post((req, res) => {
-	if (req.body.email && req.body.password && req.body.displayName) {
-		dbUsers.createUser(req.body.email, req.body.password, req.body.displayName, (result, user, err) => {
-			res.json(result ? {success: result, user: user} : {success: result, error: err});
-		});
-	} else res.json({success: false, error: {message: "Invalid request, missing email, password, or displayName", id: "missingParams"}});
+app.route("/users").get(async (req, res) => {
+    try {
+        const users = await dbUsers.getAllUsers(req.query.limit);
+        res.json({ users });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+}).post(async (req, res) => {
+    try {
+        const data = await dbUsers.createUser(req.body.email, req.body.password, req.body.displayName);
+        if (data.success) {
+            const token = jwt.createToken(data.user.id, data.user.email);
+            res.json({ data, token });
+        } else {
+            res.json({ data });
+        }
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
 });
 
-app.route("/users/auth").post((req, res) => {
-	if (req.body.email && req.body.password) {
-		dbUsers.authenticateUser(req.body.email, req.body.password, (result, err) => {
-			res.json(result ? {success: result} : {success: result, error: err});
-		});
-	} else {
-		res.json({success: false, error: {message: "Invalid request, missing email or password", id: "missingParams"}});
-	}
+app.route("/users/auth").post(async (req, res) => {
+    try {
+        const auth = await dbUsers.authenticateUser(req.body.email, req.body.password);
+        if (auth.success) {
+            const token = jwt.createToken(auth.user.id, auth.user.email);
+            res.json({ auth, token });
+        } else {
+            res.json({ auth });
+        }
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
 });
 
-app.route("/users/:userId").get((req, res) => {
-	dbUsers.getUser(req.params.userId, (result, user, err) => {
-		if (result && !!(user)) {
-			res.json({success: true, user: user});
-		} else {
-			res.json({success: false, error: err});
-		}
-	})
-}).delete((req, res) => {
-	dbUsers.deleteUser(req.params.userId, (result) => {
-		res.json({success: result});
-	});
+app.route("/users/:userId").get(async (req, res) => {
+    try {
+        const user = await dbUsers.getUser(req.params.userId);
+        res.json({ user });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
 });
 
-app.route("/posts").get((req, res) => {
-	dbPosts.getAllPosts(req.query.limit, (result, posts) => {
-		if (result && !!(posts)) {
-			res.json({success: true, posts: posts});
-		} else res.json({success: false});
-	});
+app.route("/posts/:userId/:postId").get(async (req, res) => {
+    try {
+        const post = await dbPosts.getPost(req.params.postId);
+        res.json({ post });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
 });
 
-app.route("/posts/:userId").get((req, res) => {
-	dbPosts.getAllPostsFromUser(req.params.userId, (result, posts) => {
-		if (result && !!(posts)) {
-			res.json({success: true, posts: posts});
-		} else res.json({success: false});
-	});
-}).post((req, res) => {
-	dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId, (result, post) => {
-		res.json({success: result, post: result ? post : null});
-	});
+app.route("/posts/:userId").get(async (req, res) => {
+    try {
+        const posts = await dbPosts.getAllPostsFromUser(req.params.userId, req.query.limit);
+        res.json({ posts });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
 });
 
-app.route("/posts/:userId/:postId").get((req, res) => {
-	dbPosts.getPost(req.params.postId, (result, post) => {
-		if (result && !!(post)) {
-			if (req.params.userId === post.userId) {
-				res.json({success: true, post: post});
-			} else {
-				res.json({success: false});
-			}
-		} else {
-			res.json({success: false});
-		}
-	})
-}).post((req, res) => {
-	dbPosts.updatePost(req.params.postId, req.body.title, req.body.description, req.body.tags, (result) => {
-		res.json({success: result});
-	});
-}).delete((req, res) => {
-	dbPosts.deletePost(req.params.postId, (result) => {
-		res.json({success: result});
-	});
+app.route("/posts").get(async (req, res) => {
+    try {
+        const posts = await dbPosts.getAllPosts(req.query.limit);
+        res.json({ posts });
+    } catch (e) {
+        res.status(500).send("Something broke!");
+    }
+});
+
+app.use((req, res, next) => {
+    try {
+        const token = req.body.token || req.query.token || req.headers["x-access-token"];
+
+        if (token) {
+            jwt.jwt.verify(token, jwt.options.secret, (err, decoded) => {
+                if (err) {
+                    return res.status(403).send("Invalid token");
+                } else {
+                    req.decoded = decoded;
+                    next();
+                }
+            });
+        } else {
+            res.status(403).send("No token provided");
+        }
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+});
+
+const verifyUser = (req, res, next) => {
+    try {
+        let uid = req.params.userId || req.body.userId || req.query.userId;
+
+        if (typeof(req.decoded.userId) === "number") {
+            uid = parseInt(uid, 10);
+        }
+
+        if (req.decoded.userId === uid) {
+            next();
+        } else {
+            res.status(403).json({ message: "Invalid user", id: "invalidUser" });
+        }
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+};
+
+app.use("/users/:userId", verifyUser);
+app.use("/posts/:userId", verifyUser);
+app.use("/posts/:userId/:postId", verifyUser);
+
+app.route("/users/:userId").delete(async (req, res) => {
+    try {
+        const result = await dbUsers.deleteUser(req.params.userId);
+        res.json({ result });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+});
+
+app.route("/posts/:userId/:postId").post(async (req, res) => {
+    try {
+        const result = await dbPosts.updatePost(req.params.postId, req.body.title, req.body.description, req.body.tags);
+        res.json({ result });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+}).delete(async (req, res) => {
+    try {
+        const result = await dbPosts.deletePost(req.params.postId);
+        res.json({ result });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+});
+
+app.route("/posts/:userId").post(async (req, res) => {
+    try {
+        const post = await dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId);
+        res.json({ post });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
 });
 
 app.use((req, res) => {
-	res.status(404).send(req.originalUrl + " not found");
+    res.status(404).send(req.originalUrl + " not found");
 });
 
 app.listen(port, () => {
-	console.log("Node listening on port " + port + "...");
+    /* eslint-disable-next-line no-console */
+    console.log("Node listening on port " + port + "...");
 });

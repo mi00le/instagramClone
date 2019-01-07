@@ -1,17 +1,32 @@
-var sql = require('./db-init.js');
-var db = sql.getDb();
+const sql = require("./db-init.js");
+const utils = require("../utils/users");
+const db = sql.getDb();
 
-const crypto = require('crypto');
+const crypto = require("crypto");
 
+/**
+ * Get a random string of bytes
+ * @param {number} [length=16] - Length of returned string
+ */
 var getRandomSalt = (length) => {
     length = length ? length : 16;
-    return crypto.randomBytes(Math.ceil(length/2)).toString('hex').slice(0, length);
-}
+    return crypto.randomBytes(Math.ceil(length/2)).toString("hex").slice(0, length);
+};
 
+/**
+ * Hash a password, with a salt, through SHA-512
+ * @param {string} password - Password to hash
+ * @param {string} salt - Salt to hash with
+ */
 var sha512 = (password, salt) => {
-    return crypto.createHmac('sha512', salt).update(password).digest('hex');
-}
+    return crypto.createHmac("sha512", salt).update(password).digest("hex");
+};
 
+/**
+ * Encrypt a password, using a pre-existing salt, or a generated one
+ * @param {string} password - Password to hash
+ * @param {string} [salt] - (Optional) salt to use, randomly generated if none supplied
+ */
 var encryptPass = (password, salt) => {
     salt = salt ? salt : getRandomSalt(16);
 
@@ -19,115 +34,111 @@ var encryptPass = (password, salt) => {
         salt: salt,
         hash: sha512(password, salt)
     };
-}
+};
 
-exports.authenticateUser = (email, password, callback) => {
-    console.log("Attempt auth");
-
-    db.get("SELECT * FROM Users WHERE Email=?", {1: email}, (err, row) => {
-        if (err) console.log(err.message);
+/**
+ * Verify if user email and password are correct
+ * @param {string} email
+ * @param {string} password
+ */
+exports.authenticateUser = (email, password) => new Promise(async (resolve, reject) => {
+    try {
+        if (!email) email = "";
+        if (!password) password = "";
+        const row = db.prepare("SELECT * FROM Users WHERE Email=?").get(email);
+    
+        let pass;
         if (row) {
-            var pass = encryptPass(password, row.Salt);
+            pass = encryptPass(password, row.Salt);
             if (row.Password === pass.hash) {
                 // log user in
-                console.log("Log in");
-
-                if (callback && callback instanceof Function) callback(true);
-            } else if (callback && callback instanceof Function) callback(false, {message: "Invalid auth", id: "badAuth"});
-        } else {
-            var pass = encryptPass(password); // spoof hashing time even if no user was found
-            console.log("No results");
-
-            if (callback && callback instanceof Function) callback(false, {message: "Invalid auth", id: "badAuth"});
-        }
-
-    });
-};
-
-exports.getUser = (userId, callback) => {
-    db.get("SELECT * FROM Users WHERE ID=?", userId, (err, row) => {
-        if (err) console.log(err.message);
-        if (row) {
-            if (callback && callback instanceof Function) callback(true, {
-                email: row.Email,
-                displayName: row.displayName,
-                id: row.ID
-            });
-        } else if (callback && callback instanceof Function) callback(false, {}, {message: "No user found with id", id: "notFound"});
-    })
-};
-
-exports.getAllUsers = (callback) => {
-    db.all("SELECT * FROM Users", (err, rows) => {
-        if (err) console.log(err.message);
-
-        if (rows) {
-            var result = [];
-            for (var obj of rows) {
-                result.push({
-                    email: obj.Email,
-                    displayName: obj.Password,
-                    id: obj.ID
-                })
+    
+                return resolve({ success: true, user: utils.toClientStructure(row) });
             }
-            if (callback && callback instanceof Function) callback(true, result); 
-        } else if (callback && callback instanceof Function) callback(false);
-    });
-};
+        }
+        pass = encryptPass(password); // spoof hashing time even if no user was found
+        return resolve({ success: false, err: { message: "Invalid auth", id: "badAuth" } });
+    } catch (e) {
+        return reject(e);
+    }
+});
 
-exports.createUser = (email, password, displayName, callback) => {
-    console.log("Attempt create user");
-    var pass = encryptPass(password);
+/**
+ * Get user with ID
+ * @param {string|number} userId - ID of user
+ */
+exports.getUser = (userId) => new Promise(async (resolve, reject) => {
+    try {
+        const row = db.prepare("SELECT * FROM Users WHERE ID=?").get(userId);
+        return resolve(utils.toClientStructure(row));
+    } catch (e) {
+        return reject(e);
+    }
+});
 
-    db.get("SELECT * FROM Users WHERE Email=? OR DisplayName=?", {1: email, 2: displayName}, (err, row) => {
+/**
+ * Get all users from database, with an optional limit
+ * @param {number} [limit=-1] - How many users to return
+ */
+exports.getAllUsers = (limit = -1) => new Promise(async (resolve, reject) => {
+    try {
+        const rows = db.prepare("SELECT * FROM Users LIMIT ?").get(limit);
+        return resolve(rows.map(utils.toClientStructure));
+    } catch (e) {
+        return reject(e);
+    }
+});
+
+/**
+ * Create a user, and insert it into database
+ * @param {string} email - User email
+ * @param {string} password - User password to be hashed
+ * @param {string} displayName - User displayed name
+ */
+exports.createUser = (email, password, displayName) => new Promise(async (resolve, reject) => {
+    try {
+        if (!email || !password || !displayName) return resolve({ success: false, err: {message: "Missing params", id:"missingParams"} });
+
+        let pass = encryptPass(password);
+
+        const row = db.prepare("SELECT * FROM Users WHERE Email=? OR DisplayName=?").get(email, displayName);
+
         if (row) {
             if (row.Email === email) {
-                if (callback && callback instanceof Function) callback(false, null, {message: "Email taken", id: "inUseEmail"});
+                return resolve({ success: false, err: { message: "Email taken", id: "inUseEmail" } });
             } else if (row.DisplayName === displayName) {
-                if (callback && callback instanceof Function) callback(false, null, {message: "Name taken", id: "inUseName"});
+                return resolve({ success: false, err: { message: "Name taken", id: "inUseName" } });
             } else {
-                if (callback && callback instanceof Function) callback(false, null, {message: "Unknown error", id: "unknownError"});
+                return resolve({ success: false, err: { message: "Unknown error", id: "unknownError" } });
             }
-        } else if (err) {
-            console.log(err.message);
-            if (callback && callback instanceof Function) callback(false);
         } else {
-            db.run("INSERT INTO Users(Email, Password, Salt, DisplayName) VALUES(?, ?, ?, ?)", {
-                1: email,
-                2: pass.hash,
-                3: pass.salt,
-                4: displayName
-            }, function (err) {
-                if (err) {
-                    if (callback && callback instanceof Function) callback(false);
-                    console.log(err.message);
-                    return;
-                }
+            const result = db.prepare("INSERT INTO Users(Email, Password, Salt, DisplayName) VALUES(?, ?, ?, ?)").run(
+                email, pass.hash, pass.salt, displayName
+            );
 
-                if (callback && callback instanceof Function) callback(true, {
-                    email: email,
-                    displayName: displayName,
-                    id: this.lastID
-                });
-            });
+            const uid = result.lastInsertRowid;
+
+            return resolve({ success: true, user: {
+                email: email,
+                displayName: displayName,
+                id: uid
+            }});
         }
-    });
-};
+    } catch (e) {
+        return reject(e);
+    }
+});
 
-exports.deleteUser = (userId, callback) => {
-    console.log("Attempt delete user");
-
-    db.run("DELETE FROM Posts WHERE AuthorID=?", userId, (err) => {
-        if (err) {
-            console.log(err);
-            if (callback && callback instanceof Function) callback(false);
-        } else {
-            db.run("DELETE FROM Users WHERE ID=?", userId, (err) => {
-                if (err) console.log(err.message);
-                else console.log("Deleted.");
-
-                if (callback && callback instanceof Function) callback(!(err));
-            });
-        }
-    });
-};
+/**
+ * Delete a user, and their posts, from the database
+ * @param {string|number} userId - ID of user to remove
+ */
+exports.deleteUser = (userId) => new Promise(async(resolve, reject) => {
+    try {
+        db.prepare("DELETE FROM Posts WHERE AuthorID=?").run(userId);
+        const result = db.prepare("DELETE FROM Users WHERE ID=?").run(userId);
+        return resolve(result.changes > 0);
+    } catch (e) {
+        return reject(e);
+    }
+});
