@@ -22,4 +22,3 @@ describe("User Routes", () => {
         });
     });
 });
-
