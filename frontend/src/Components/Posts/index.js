@@ -1,9 +1,11 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import {Col, Grid, Row} from "react-bootstrap";
 import Profile from "./../Profile";
 import Post from "./../Post";
 
-export default class Posts extends Component {
+
+class Posts extends Component {
   constructor(props) {
     super(props);
 
@@ -33,3 +35,9 @@ export default class Posts extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return { articles: state.articles}
+}
+
+export default connect(mapStateToProps)(Posts);

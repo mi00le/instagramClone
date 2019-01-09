@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { render } from "react-dom";
 import axios from "axios";
 import qs from "qs";
 import "./App.css";
@@ -103,8 +104,8 @@ class App extends Component {
 
   userClick = (id) => {
     this.setState({
-      id: id,sd
-      postCount: deafultPostCountsdfasf
+      id: id,
+      postCount: deafultPostCount
     }, () => {
       this.refreshPosts();
     });
@@ -112,7 +113,7 @@ class App extends Component {
 
   render() {
     return (
-      <div style={{ background: this.state.username ? "#f7f7f7" : "#fff" }} className="App">
+      <div style={{marginTop: this.state.username ? 30 : 0}} className="App">
         <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
         {this.state.username ? <Posts profile={this.state.id} items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} />}
       </div>
