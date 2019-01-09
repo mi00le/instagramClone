@@ -36,6 +36,8 @@ var encryptPass = (password, salt) => {
     };
 };
 
+exports.encryptPass = encryptPass;
+
 /**
  * Verify if user email and password are correct
  * @param {string} email
@@ -70,7 +72,7 @@ exports.authenticateUser = (email, password) => new Promise(async (resolve, reje
 exports.getUser = (userId) => new Promise(async (resolve, reject) => {
     try {
         const row = db.prepare("SELECT * FROM Users WHERE ID=?").get(userId);
-        return resolve(utils.toClientStructure(row));
+        return resolve(row ? utils.toClientStructure(row) : null);
     } catch (e) {
         return reject(e);
     }
@@ -82,8 +84,9 @@ exports.getUser = (userId) => new Promise(async (resolve, reject) => {
  */
 exports.getAllUsers = (limit = -1) => new Promise(async (resolve, reject) => {
     try {
-        const rows = db.prepare("SELECT * FROM Users LIMIT ?").get(limit);
-        return resolve(rows.map(utils.toClientStructure));
+        let rows = db.prepare("SELECT * FROM Users LIMIT ?").get(limit);
+        if (!(rows instanceof Array)) rows = [rows];
+        return resolve(rows ? rows.map(utils.toClientStructure) : []);
     } catch (e) {
         return reject(e);
     }
@@ -101,7 +104,15 @@ exports.createUser = (email, password, displayName) => new Promise(async (resolv
 
         let pass = encryptPass(password);
 
-        const row = db.prepare("SELECT * FROM Users WHERE Email=? OR DisplayName=?").get(email, displayName);
+        const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i;
+
+        if (!emailRegex.test(email)) return resolve({ success: false, err: { message: "Invalid email address", id: "malformedEmail" } });
+
+        const nameRegex = /^[A-Za-z0-9._-]+$/;
+
+        if (!nameRegex.test(displayName)) return resolve({ success: false, err: { message: "Invalid display name (Alphanumeric and .-_ only)", id: "malformedName" } });
+
+        const row = db.prepare("SELECT * FROM Users WHERE Email LIKE ? OR DisplayName=?").get(email, displayName);
 
         if (row) {
             if (row.Email === email) {

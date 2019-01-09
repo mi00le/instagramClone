@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import axios from "axios";
 import qs from "qs";
 import "./App.css";
-import { Grid, Row, Col } from "react-bootstrap";
 
 import Navbar from "./Components/Navbar/";
 import Login from "./Components/Login/";
@@ -11,38 +10,36 @@ import Posts from "./Components/Posts/";
 const amountToAdd = 10;
 
 class App extends Component {
-  constructor(props) {
-    super(props);
+  state = {
+    posts: [],
+    username: localStorage.getItem("username"),
+    userId: localStorage.getItem("id"),
+    postCount: 5,
+    id: 0,
+  };
 
-    this.state = {
-      posts: [],
-      username: localStorage.getItem("username"),
-      userId: localStorage.getItem("id"),
-      postCount: 5,
-      id: 0,
-    };
+  componentDidMount() {
     this.refreshPosts();
-
-    this.updateInfo = this.updateInfo.bind(this);
-    this.refreshPosts = this.refreshPosts.bind(this);
-    this.login = this.login.bind(this);
-    this.loadMorePosts = this.loadMorePosts.bind(this);
-    this.userClick = this.userClick.bind(this);
-    this.checkUser = this.checkUser.bind(this);
   }
 
-  checkUser(){
-  localStorage.clear();
-  this.setState({
-     username: null
-   });
- }
+  checkUser = () => {
+    localStorage.clear();
+    this.setState({
+      username: null
+    });
+  }
 
-  updateInfo() {
+  updateInfo = async () => {
+    const {
+      userId,
+      username,
+    } = this.state
+
     const u = document.querySelector("#imgUrl");
     const t = document.querySelector("#title");
     const d = document.querySelector("#desc");
     const tag = document.querySelector("#tags");
+
 
 
     let a = document.querySelectorAll('.react-tagsinput-tag');
@@ -51,36 +48,48 @@ class App extends Component {
     for(let i = 0; i < a.length; i++){
       tagArr.push(a[i].innerText);
     }
-    tagArr = JSON.stringify(tagArr);
+    try {
+      const res = await axios.post(
+        `http://localhost:3002/posts/${userId}`,
+        qs.stringify({
+          username,
+          image: u.value,
+          title: t.value,
+          description: d.value,
+          tags: tagArr
+        }),
+      )
 
-    axios.post("http://localhost:3002/posts/1", qs.stringify({image: u.value, title: t.value, description: d.value, username: "BestUser", tags: tagArr}))
-    .then((res) => {
       if (res.data.post) {
-        this.setState({posts: [res.data.post, ...this.state.posts]});
+        this.setState({ posts: [res.data.post, ...this.state.posts] });
       } else {
         this.refreshPosts();
       }
-    }).catch(() => {});
+    } catch (e) {
+      console.error(e)
+    }
   }
-  refreshPosts() {
+
+  refreshPosts = () => {
     if (!this.state.id) {
       axios.get("http://localhost:3002/posts?limit=" + this.state.postCount)
-      .then((response) => {
-        this.setState({
-          posts: response.data.posts
-        });
-      }).catch(() => {});
+        .then((response) => {
+          this.setState({
+            posts: response.data.posts
+          });
+        }).catch(() => { });
     }
     else {
-      axios.get("http://localhost:3002/posts/"+ this.state.id)
-      .then((response) => {
-        this.setState({
-          posts: response.data.posts
-        });
-      }).catch(() => {});
+      axios.get("http://localhost:3002/posts/" + this.state.id)
+        .then((response) => {
+          this.setState({
+            posts: response.data.posts
+          });
+        }).catch(() => { });
     }
   }
-  loadMorePosts(){
+
+  loadMorePosts = () => {
     this.setState({
       postCount: this.state.postCount + amountToAdd,
     }, () => {
@@ -88,18 +97,18 @@ class App extends Component {
     });
   }
 
-  login(email, username, id, token) {
-  this.setState({
-    username: username,
-    userId: id
-  });
-  localStorage.setItem("email", email);
-  localStorage.setItem("username", username);
-  localStorage.setItem("id", id);
-  localStorage.setItem("token", token);
-}
+  login = (email, username, id, token) => {
+    this.setState({
+      username: username,
+      userId: id
+    });
+    localStorage.setItem("email", email);
+    localStorage.setItem("username", username);
+    localStorage.setItem("id", id);
+    localStorage.setItem("token", token);
+  }
 
-  userClick(id){
+  userClick = (id) => {
     this.setState({
       id: id
     }, () => {
@@ -109,11 +118,9 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
-        <header>
-        </header>
-        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} handleChange={this.state.tags}/>
-        <Posts items={this.state.posts} />
+      <div style={{ background: this.state.username ? "#f7f7f7" : "#fff" }} className="App">
+        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
+        {this.state.username ? <Posts profile={this.state.id} items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} />}
       </div>
     );
   }

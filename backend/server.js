@@ -13,21 +13,14 @@ app.use(cors());
 
 const port = process.env.PORT || 3002;
 
-app.route("/users").get(async (req, res) => {
-    try {
-        const users = await dbUsers.getAllUsers(req.query.limit);
-        res.json({ users });
-    } catch (e) {
-        res.status(500).send("Internal error");
-    }
-}).post(async (req, res) => {
+app.route("/users").post(async (req, res) => {
     try {
         const data = await dbUsers.createUser(req.body.email, req.body.password, req.body.displayName);
         if (data.success) {
             const token = jwt.createToken(data.user.id, data.user.email);
             res.json({ data, token });
         } else {
-            res.json({ data });
+            res.status(403).json({ data });
         }
     } catch (e) {
         res.status(500).send("Internal error");
@@ -41,7 +34,7 @@ app.route("/users/auth").post(async (req, res) => {
             const token = jwt.createToken(auth.user.id, auth.user.email);
             res.json({ auth, token });
         } else {
-            res.json({ auth });
+            res.status(403).json({ auth });
         }
     } catch (e) {
         res.status(500).send("Internal error");
@@ -51,7 +44,8 @@ app.route("/users/auth").post(async (req, res) => {
 app.route("/users/:userId").get(async (req, res) => {
     try {
         const user = await dbUsers.getUser(req.params.userId);
-        res.json({ user });
+        if (user) res.json({ user });
+        else res.status(404).send("User not found");
     } catch (e) {
         res.status(500).send("Internal error");
     }
@@ -68,7 +62,7 @@ app.route("/posts/:userId/:postId").get(async (req, res) => {
 
 app.route("/posts/:userId").get(async (req, res) => {
     try {
-        const posts = await dbPosts.getAllPostsFromUser(req.params.userId, req.query.limit);
+        const posts = await dbPosts.getAllPostsFromUser(req.params.userId, req.query.limit, req.query.tag);
         res.json({ posts });
     } catch (e) {
         res.status(500).send("Internal error");
@@ -77,7 +71,7 @@ app.route("/posts/:userId").get(async (req, res) => {
 
 app.route("/posts").get(async (req, res) => {
     try {
-        const posts = await dbPosts.getAllPosts(req.query.limit);
+        const posts = await dbPosts.getAllPosts(req.query.limit, req.query.tag);
         res.json({ posts });
     } catch (e) {
         res.status(500).send("Something broke!");
@@ -86,7 +80,8 @@ app.route("/posts").get(async (req, res) => {
 
 app.use((req, res, next) => {
     try {
-        const token = req.body.token || req.query.token || req.headers["x-access-token"];
+        // const token = req.body.token || req.query.token || req.headers["x-access-token"];
+        const token = req.headers.authorization;
 
         if (token) {
             jwt.jwt.verify(token, jwt.options.secret, (err, decoded) => {
@@ -126,6 +121,15 @@ const verifyUser = (req, res, next) => {
 app.use("/users/:userId", verifyUser);
 app.use("/posts/:userId", verifyUser);
 app.use("/posts/:userId/:postId", verifyUser);
+
+app.route("/users").get(async (req, res) => {
+    try {
+        const users = await dbUsers.getAllUsers(req.query.limit);
+        res.json({ users });
+    } catch (e) {
+        res.status(500).send("Internal error");
+    }
+});
 
 app.route("/users/:userId").delete(async (req, res) => {
     try {
@@ -169,3 +173,5 @@ app.listen(port, () => {
     /* eslint-disable-next-line no-console */
     console.log("Node listening on port " + port + "...");
 });
+
+module.exports = app;
