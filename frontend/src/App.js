@@ -88,6 +88,17 @@ class App extends Component {
     });
   }
 
+  login(email, username, id, token) {
+  this.setState({
+    username: username,
+    userId: id
+  });
+  localStorage.setItem("email", email);
+  localStorage.setItem("username", username);
+  localStorage.setItem("id", id);
+  localStorage.setItem("token", token);
+}
+
   userClick(id){
     this.setState({
       id: id
