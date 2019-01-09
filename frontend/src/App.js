@@ -40,6 +40,14 @@ class App extends Component {
     const d = document.querySelector("#desc");
     const tag = document.querySelector("#tags");
 
+
+
+    let a = document.querySelectorAll('.react-tagsinput-tag');
+
+    let tagArr = [];
+    for(let i = 0; i < a.length; i++){
+      tagArr.push(a[i].innerText);
+    }
     try {
       const res = await axios.post(
         `http://localhost:3002/posts/${userId}`,
@@ -48,7 +56,7 @@ class App extends Component {
           image: u.value,
           title: t.value,
           description: d.value,
-          tags: tag.value
+          tags: tagArr
         }),
       )
 
@@ -116,6 +124,7 @@ class App extends Component {
       </div>
     );
   }
+
 }
 
 export default App;
