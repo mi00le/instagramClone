@@ -26,7 +26,7 @@ class Posts extends Component {
       <div>
       <Grid>
         <Row className="show-grid">
-        {this.props.profile && <Profile newest={this.props.items[0].createdAt} count={this.props.items.length} name={this.props.items[0].username} userClick={this.props.userClick} />}
+        {this.props.profile && this.props.items.length && <Profile newest={this.props.items[0].createdAt} count={this.props.items.length} name={this.props.items[0].username} userClick={this.props.userClick} />}
           {this.props.items.slice(0, this.renderAmount()).map(post => <Post tags={post.tags} title={post.title} imgUrl={post.url} description={post.description} username={post.username} id={post.userId} createdAt={post.createdAt} userClick={this.props.userClick} />)}
         </Row>
       </Grid>

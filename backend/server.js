@@ -161,7 +161,6 @@ app.route("/posts/:userId").post(async (req, res) => {
         const post = await dbPosts.createPost(req.body.image, req.body.title, req.body.description, req.body.tags, req.body.username, req.params.userId);
         res.json({ post });
     } catch (e) {
-        console.log(e);
         res.status(500).send("Internal error");
     }
 });

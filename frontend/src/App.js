@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { render } from "react-dom";
 import axios from "axios";
 import qs from "qs";
+import { connect } from 'react-redux'
 import "./App.css";
+import { actions } from './store/modules/user'
 
 import Navbar from "./Components/Navbar/";
 import Login from "./Components/Login/";
@@ -11,7 +12,7 @@ import Posts from "./Components/Posts/";
 const deafultPostCount = 5;
 const amountToAdd = 10;
 
-class App extends Component {
+export class App extends Component {
   state = {
     posts: [],
     username: localStorage.getItem("username"),
@@ -22,6 +23,7 @@ class App extends Component {
 
   componentDidMount() {
     this.refreshPosts();
+    this.props.getUser(this.props.userId)
   }
 
   checkUser = () => {
@@ -115,10 +117,19 @@ class App extends Component {
     return (
       <div style={{marginTop: this.state.username ? 30 : 0}} className="App">
         <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
-        {this.state.username ? <Posts profile={this.state.id} items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} />}
+        {this.props.isLoggedIn ? <Posts profile items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} />}
       </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = ({ user }) => ({
+  isLoggedIn: user.auth,
+  userId: user.id,
+})
+
+const mapDispatchToProps = dispatch => ({
+  getUser: (id) => dispatch(actions.getUser(id)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
