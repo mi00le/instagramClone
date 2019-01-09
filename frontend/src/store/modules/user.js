@@ -16,6 +16,7 @@ const types = {
   loginFailure: 'user/login/failure',
   getUserSuccess: 'user/get/success',
   getUserFailure: 'user/get/failure',
+  logout : 'user/logout',
 }
 
 export const actions = {
@@ -33,7 +34,8 @@ export const actions = {
 
   getUser: id => dispatch => axios.get(`http://localhost:3002/users/${id}`)
     .then(({ data }) => dispatch({ type: types.getUserSuccess, payload: data }))
-    .catch(() => dispatch({ type: types.getUserFailure }))
+    .catch(() => dispatch({ type: types.getUserFailure })),
+    logout : () => ({ type: types.logout })
 }
 
 const reducer = (state = defaultState, action) => {
@@ -54,6 +56,16 @@ const reducer = (state = defaultState, action) => {
         ...state,
         auth: true,
       }
+    }
+    case types.logout : {
+      window.localStorage.clear();
+      axios.defaults.headers.common['Authorization'] = null;
+      return {
+        ...state,
+        auth : false,
+        id : null,
+      }
+
     }
     default: return state
   }
