@@ -1,5 +1,5 @@
 import store from "./store/index";
-import { addArticle } from "./store/actions/index";
+import { getPosts } from "./store/actions/index";
 
 window.store = store;
-window.addArticle = addArticle;
+window.addArticle = getPosts;
