@@ -1,12 +1,12 @@
 .disable-select {
-  -webkit-user-select: none;  
-  -moz-user-select: none;    
-  -ms-user-select: none;      
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
 }
 .navbar-main{
-
-	background-color: #EDEDED !important;
+  background-color: #ded8dd;
+  background-image: linear-gradient(to right, #ded8dd, #ffffff);
 }
 .grid{
 	color : #000;
@@ -25,7 +25,7 @@ animation-duration: 0.8s !important;
 }
 .camera-icon{
 	font-size: 40px;
-	margin-top: 15px; 
+	margin-top: 15px;
 	color : #FFF;
 	filter: drop-shadow( 1.8px 1.8px 1.8px #000 );
 
@@ -37,7 +37,7 @@ animation-duration: 0.8s !important;
 	margin: 50px;
 }
 .input-style{
-	
+
   	width: 100%;
   	text-align : center;
   	word-break: break-all;
@@ -65,17 +65,51 @@ p.insta-clone{
 p.insta-clone:active{
 	text-shadow: 1px 1px 2px black;
 }
+.form-container{
+
+margin: 50px 50px 20px 20px;
+text-align: right;
+
+}
+
+.flex-container{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+
+}
+.flex-container > div:nth-child(odd){
+  flex: 1 0 20%;
+/* width: 20%; */
+text-align: right;
+padding-top: 20px;
+margin: auto;
+
+}
+.flex-container > div:nth-child(even){
+/* width: 80%; */
+flex: 2 0 80%;
+padding-top: 20px;
+
+}
+
+
+
+
 .popup-content{
 border : none !important;
 padding :  0px !important;
-width : 20% !important;
+width : 60% !important;
 min-width : 300px !important;
 border-radius:10px !important;
 background-color : #e7e7e7 !important;
+max-width: 600px !important;
 }
 .btn-primary {
 height : 50px !important;
-
+float: right;
+width: 80%;
 }
 #desc{
 resize : none;
@@ -92,6 +126,12 @@ p.logout-nav:active{
 
 	text-shadow: 1px 1px 2px black;
 }
+p{
+  word-wrap: break-word;
+}
+h3{
+  word-wrap: break-word;
+}
 
 @media only screen and (max-width: 990px) {
  p.insta-clone {
@@ -101,5 +141,81 @@ p.logout-nav:active{
 @media only screen and (max-width: 767px) {
  p.insta-clone {
     visibility: hidden;
+  }
+}
+
+input[type=text], textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+label {
+  padding: 12px 12px 12px 0;
+  display: inline-block;
+  padding-top: 0px;
+}
+
+.btn-primary {
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  margin-top: 20px;
+  width: 35%;
+}
+
+.btn-primary:hover {
+  background-color: #2e6da4;
+}
+
+.form-container {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+  margin: 20px;
+}
+
+.col-25 {
+  float: left;
+  width: 25%;
+  margin-top: 6px;
+  text-align: left;
+}
+
+.col-75 {
+  float: left;
+  width: 75%;
+  margin-top: 6px;
+}
+
+.react-tagsinput > span > input[type=text]{
+  border:none;
+}
+.react-tagsinput-tag{
+  float: left;
+
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .col-25, .col-75, .btn-primary {
+    width: 100%;
+    margin-top: 0;
+
+  }
+  label{
+    padding-top: 5px;
   }
 }
