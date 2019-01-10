@@ -103,17 +103,6 @@ export class App extends Component {
     });
   }
 
-  login = (email, username, id, token) => {
-    this.setState({
-      username: username,
-      userId: id
-    });
-    localStorage.setItem("email", email);
-    localStorage.setItem("username", username);
-    localStorage.setItem("id", id);
-    localStorage.setItem("token", token);
-  }
-
   userClick = (id) => {
     this.setState({
       id: id,
@@ -127,7 +116,7 @@ export class App extends Component {
     return (
       <div style={{marginTop: this.state.username ? 30 : 0}} className="App">
         {!this.props.isLoggedIn ?(
-            <Login sucessFunction={this.login} />
+            <Login />
         ) : (
           <>
           <Navbar handler={this.updateInfo} handleLogout={this.props.logout} />

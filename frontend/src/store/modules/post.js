@@ -5,8 +5,8 @@ const defaultState = {
 }
 
 const types = {
-  getPostsSuccess: 'user/login/success',
-  getPostsFailure: 'user/login/failure',
+  getPostsSuccess: 'user/login/dank',
+  getPostsFailure: 'user/login/dank',
 }
 
 export const actions = {
