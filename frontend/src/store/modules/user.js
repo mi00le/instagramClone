@@ -47,15 +47,12 @@ export const actions = {
       dispatch({
           type : types.registerSuccess,
           payload : res.data
-        })
-        ).catch((err) =>
-          dispatch({ type : types.registerFailure})),
+        })).catch((err) => dispatch({ type : types.registerFailure})),
 
 }
 
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
-    case types.registerSuccess :
     case types.loginSuccess: {
       axios.defaults.headers.common['Authorization'] = action.payload.token
       window.localStorage.setItem('token', action.payload.token)
@@ -65,6 +62,17 @@ const reducer = (state = defaultState, action) => {
         auth: true,
         id: action.payload.auth.user.id,
         displayName: action.payload.auth.user.displayName,
+      }
+    }
+    case types.registerSuccess : {
+      axios.defaults.headers.common['Authorization'] = action.payload.token
+      window.localStorage.setItem('token', action.payload.token)
+      window.localStorage.setItem('id', action.payload.data.user.id)
+      return {
+        ...state,
+        auth: true,
+        id: action.payload.data.user.id,
+        displayName: action.payload.data.user.displayName,
       }
     }
     case types.getUserSuccess: {
@@ -84,7 +92,7 @@ const reducer = (state = defaultState, action) => {
 
     }
     case types.registerFailure : {
-      console.log(action);
+      console.log(action.type);
       return state
     }
     default: return state

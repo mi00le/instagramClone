@@ -90,7 +90,8 @@ export class Login extends Component {
   handleUsername = (event) => {
     this.setState({ username : event.target.value });
   }
-  register() {
+  register(e) {
+    e.preventDefault();
     const username = document.getElementById('username').value;
     const password = document.getElementById('password2').value;
 
