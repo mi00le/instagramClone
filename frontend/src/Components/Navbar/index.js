@@ -14,7 +14,7 @@ export default class Navbar extends React.Component {
         <Grid className="grid">
           <Row className="show-grid">
             <Col xs={4} className="col-left">
-              <Popup
+              {this.props.isLoggedIn && <Popup
                 className="w3-animate-top popup"
                 trigger={
                   <FontAwesomeIcon
@@ -77,21 +77,21 @@ export default class Navbar extends React.Component {
                     </div>
                   </div>
                 </form>
-              </Popup>
+              </Popup>}
             </Col>
             <Col xs={4}className="col-right">
               <a href="#top" className="insta-clone">
-                <p className="insta-clone disable-select ">InstaClone</p>
+                <p className={`disable-select ${this.props.isLoggedIn ? "insta-clone" : "insta-cloneToggle"}`}>InstaClone</p>
               </a>
             </Col>
             <Col xs={4} className="col-right">
-              <a
+              {this.props.isLoggedIn && <a
                 href="#logout"
                 className="logout-nav"
                 onClick={this.props.handleLogout}
               >
                 <p className="logout-nav disable-select ">Logout</p>
-              </a>
+              </a>}
             </Col>
           </Row>
         </Grid>

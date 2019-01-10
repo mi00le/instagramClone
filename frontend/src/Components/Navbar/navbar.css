@@ -49,6 +49,23 @@ animation-duration: 0.8s !important;
 .col-right{
 	text-align: right;
 }
+
+a.insta-cloneToggle{
+	text-decoration: none;
+}
+p.insta-cloneToggle{
+	font-size: 40px;
+	margin-top: 5px;
+	margin-right: 31%;
+	float: left;
+	float: right;
+	color: #FFF;
+	font-family: 'Lobster', cursive;
+	text-shadow: 1px 2px 3px black;
+}
+p.insta-cloneToggle:active{
+	text-shadow: 1px 1px 2px black;
+}
 a.insta-clone{
 	text-decoration: none;
 }
