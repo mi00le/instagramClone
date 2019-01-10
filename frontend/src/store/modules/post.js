@@ -5,8 +5,8 @@ const defaultState = {
 }
 
 const types = {
-  getPostsSuccess: 'user/login/dank',
-  getPostsFailure: 'user/login/dank',
+  getPostsSuccess: 'post/getPosts/success',
+  getPostsFailure: 'post/getPosts/failure',
 }
 
 export const actions = {
@@ -15,7 +15,7 @@ export const actions = {
       axios.get(
         `http://localhost:3002/posts?limit=${count}`)
         .then(({ data }) => {
-          console.log(data)
+          console.log(data.posts);
           return dispatch({
             type: types.getPostsSuccess,
             payload: data.posts
