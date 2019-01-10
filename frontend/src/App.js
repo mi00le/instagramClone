@@ -30,7 +30,9 @@ export class App extends Component {
     localStorage.clear();
     this.setState({
       username: null
+
     });
+
   }
 
   updateInfo = async () => {
@@ -124,8 +126,7 @@ export class App extends Component {
   render() {
     return (
       <div style={{marginTop: this.state.username ? 30 : 0}} className="App">
-        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
-        {this.props.isLoggedIn ? <Posts profile items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} />}
+        {this.props.isLoggedIn ? <Navbar handler={this.updateInfo} handleLogout={this.props.logout} /> || <Posts profile items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} />}
       </div>
     );
   }
@@ -139,6 +140,7 @@ const mapStateToProps = ({ user }) => ({
 
 const mapDispatchToProps = dispatch => ({
   getUser: (id) => dispatch(actions.getUser(id)),
+  logout : () => dispatch(actions.logout()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
