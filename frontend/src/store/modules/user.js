@@ -19,7 +19,6 @@ const types = {
   logout : 'user/logout',
   registerSuccess : 'user/register/success',
   registerFailure : 'user/register/failure'
-
 }
 
 export const actions = {
@@ -89,11 +88,6 @@ const reducer = (state = defaultState, action) => {
         auth : false,
         id : null,
       }
-
-    }
-    case types.registerFailure : {
-      console.log(action.type);
-      return state
     }
     default: return state
   }
