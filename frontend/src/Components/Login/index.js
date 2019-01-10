@@ -87,26 +87,25 @@ export class Login extends Component {
   handleChangePass = (event) => {
     this.setState({ password: event.target.value });
   }
+  handleUsername = (event) => {
+    this.setState({ username : event.target.value });
+  }
   register() {
     const username = document.getElementById('username').value;
-    const password2 = document.getElementById('password2').value;
+    const password = document.getElementById('password2').value;
 
-    if (this.state.password != password2) {
+
+
+    if (this.state.password !== password) {
       this.setState({
         errorMsg: "Passwords does not match",
       });
       return
     }
-    axios.post("http://localhost:3002/users", qs.stringify({ email: this.state.email, password: this.state.password, displayName: username }))
-      .then((res) => {
-        if (!res.data.data.success) { throw new Error(res.data.data.err.message) };
-        this.props.sucessFunction(this.state.email, username, res.data.data.user.id, res.data.token);
-      }).catch((err) => {
-        this.setState({
-          errorMsg: err.message,
-          register: true
-        });
-      });
+    const {
+      email,
+    } = this.state
+    this.props.register({ email, password, displayName : username })
   }
 
   render() {
@@ -136,6 +135,7 @@ export class Login extends Component {
 
 const mapDispatchToProps = dispatch => ({
   login: credentials => dispatch(actions.login(credentials)),
+  register : credentials => dispatch(actions.register(credentials)),
 })
 
 export default connect(null, mapDispatchToProps)(Login)

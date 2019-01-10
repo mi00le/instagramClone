@@ -17,6 +17,9 @@ const types = {
   getUserSuccess: 'user/get/success',
   getUserFailure: 'user/get/failure',
   logout : 'user/logout',
+  registerSuccess : 'user/register/success',
+  registerFailure : 'user/register/failure'
+
 }
 
 export const actions = {
@@ -35,11 +38,24 @@ export const actions = {
   getUser: id => dispatch => axios.get(`http://localhost:3002/users/${id}`)
     .then(({ data }) => dispatch({ type: types.getUserSuccess, payload: data }))
     .catch(() => dispatch({ type: types.getUserFailure })),
-    logout : () => ({ type: types.logout })
+    logout : () => ({ type: types.logout }),
+
+    register : (input) =>
+      dispatch =>
+      axios.post("http://localhost:3002/users", qs.stringify( input ))
+        .then((res) =>
+      dispatch({
+          type : types.registerSuccess,
+          payload : res.data
+        })
+        ).catch((err) =>
+          dispatch({ type : types.registerFailure})),
+
 }
 
 const reducer = (state = defaultState, action) => {
   switch (action.type) {
+    case types.registerSuccess :
     case types.loginSuccess: {
       axios.defaults.headers.common['Authorization'] = action.payload.token
       window.localStorage.setItem('token', action.payload.token)
@@ -66,6 +82,10 @@ const reducer = (state = defaultState, action) => {
         id : null,
       }
 
+    }
+    case types.registerFailure : {
+      console.log(action);
+      return state
     }
     default: return state
   }
