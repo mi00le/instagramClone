@@ -15,19 +15,38 @@ const tagLength = 10;
 export default class Navbar extends React.Component {
   constructor() {
     super();
-    this.state = { tags: [], tag: "" };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleChangeInput = this.handleChangeInput.bind(this);
+    this.state = {
+      tags: [],
+      tag: "",
+      imageUrl: "",
+      title: "",
+      subject: ""
+    };
   }
 
-  handleChange(tags) {
+  handleChange = (tags) => {
     this.setState({ tags });
   }
 
-  handleChangeInput(tag) {
+  handleChangeInput = (tag) => {
     if(tag.length <= tagLength){
       this.setState({ tag });
     }
+  }
+  handleChangeImage = (event) => {
+    this.setState({
+      imageUrl: event.target.value
+    })
+  }
+  handleChangeTitle = (event) => {
+    this.setState({
+      title: event.target.value
+    })
+  }
+  handleChangeSubject = (event) => {
+    this.setState({
+      subject: event.target.value
+    })
   }
   render() {
     return (
@@ -56,7 +75,8 @@ export default class Navbar extends React.Component {
                     <div className="col-75">
                       <input
                         type="text"
-                        id="imgUrl"
+                        onChange={this.handleChangeImage}
+                        value={this.state.imageUrl}
                         className="form-control"
                         placeholder="Enter image url.."
                       />
@@ -69,7 +89,8 @@ export default class Navbar extends React.Component {
                     <div className="col-75">
                       <input
                         type="text"
-                        id="title"
+                        onChange={this.handleChangeTitle}
+                        value={this.state.title}
                         className="form-control"
                         placeholder="Enter a title.."
                       />
@@ -95,7 +116,8 @@ export default class Navbar extends React.Component {
                     </div>
                     <div className="col-75">
                       <textarea
-                        id="desc"
+                        onChange={this.handleChangeSubject}
+                        value={this.state.subject}
                         className="form-control"
                         name="subject"
                         placeholder="Write something.."
@@ -107,7 +129,7 @@ export default class Navbar extends React.Component {
                     <button
                       id="btn"
                       className="form-control btn-primary"
-                      onClick={this.props.handler}
+                      onClick={() => {this.props.handler()}}
                     >
                       Upload
                     </button>

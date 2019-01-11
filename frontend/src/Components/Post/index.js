@@ -44,7 +44,7 @@ export default class Post extends Component {
             <p style={postItemText}>by <a onClick={() => {this.props.userClick(this.props.id)}}>{this.props.username}</a></p>
           </div>
           <div style={postItem}>
-            {/*<p style={postItemText}>{this.props.tags.replace(/"/g, '') ? this.props.tags.replace(/"/g, '').split(",").map((text) => <a style={{margin: "0 3px"}} href="#">{text}</a>) : "no tags"}</p>*/}
+            {<p style={postItemText}>{this.props.tags.replace(/"/g, '') ? this.props.tags.replace(/"/g, '').split(",").map((text) => <a style={{margin: "0 3px"}} href="#">{text}</a>) : "no tags"}</p>}
           </div>
           <div style={postItem}>
             <p style={postItemText}>{timeSince(new Date(this.props.createdAt))} ago</p>

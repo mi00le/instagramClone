@@ -4,6 +4,7 @@ import qs from "qs";
 import { connect } from 'react-redux'
 import "./App.css";
 import { actions } from './store/modules/user'
+import { actions as postActions } from './store/modules/post'
 
 import Navbar from "./Components/Navbar/";
 import Login from "./Components/Login/";
@@ -14,15 +15,11 @@ const amountToAdd = 10;
 
 export class App extends Component {
   state = {
-    posts: [],
     username: localStorage.getItem("username"),
     userId: localStorage.getItem("id"),
-    postCount: 5,
-    id: 0,
   };
 
   componentDidMount() {
-    this.refreshPosts();
     this.props.getUser(this.props.userId)
   }
 
@@ -75,51 +72,25 @@ export class App extends Component {
       console.error(e)
     }
   }
-
-  refreshPosts = () => {
-    if (!this.state.id) {
-      axios.get("http://localhost:3002/posts?limit=" + this.state.postCount)
-        .then((response) => {
-          this.setState({
-            posts: response.data.posts
-          });
-        }).catch(() => { });
+  uploadPost = (imgUrl, title, tags, subject, userId) => {
+    const items = {
+      imgUrl,
+      title,
+      tags,
+      subject,
+      userId
     }
-    else {
-      axios.get("http://localhost:3002/posts/" + this.state.id)
-        .then((response) => {
-          this.setState({
-            posts: response.data.posts
-          });
-        }).catch(() => { });
-    }
-  }
-
-  loadMorePosts = () => {
-    this.setState({
-      postCount: this.state.postCount + amountToAdd,
-    }, () => {
-      this.refreshPosts();
-    });
-  }
-
-  userClick = (id) => {
-    this.setState({
-      id: id,
-      postCount: deafultPostCount
-    }, () => {
-      this.refreshPosts();
-    });
+    this.props.uploadPost(items)
   }
 
   render() {
     return (
-      <div style={{marginTop: this.state.username ? 30 : 0}} className="App">
+      <div style={{marginTop: this.props.isLoggedIn ? 45 : 0}} className="App">
         {!this.props.isLoggedIn ?(
             <Login />
         ) : (
           <>
-          <Navbar handler={this.updateInfo} handleLogout={this.props.logout} />
+          <Navbar handler={this.uploadPost} handleLogout={this.props.logout} />
           <Posts items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} />
           </>
         )}
@@ -137,6 +108,7 @@ const mapStateToProps = ({ user }) => ({
 const mapDispatchToProps = dispatch => ({
   getUser: (id) => dispatch(actions.getUser(id)),
   logout : () => dispatch(actions.logout()),
+  uploadPost : () => dispatch(postActions.uploadPost()),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
