@@ -74,17 +74,6 @@ export default class Navbar extends React.Component {
                         <label>Image</label>
                       </div>
                       <div className="col-75">
-                        <input
-                          type="text"
-                          id="imgUrl"
-                          className="form-control input-style"
-                          placeholder="Image Url"
-                          autoFocus
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="col-75">
                       <input
                         type="text"
                         onChange={this.handleChangeImage}
@@ -92,6 +81,21 @@ export default class Navbar extends React.Component {
                         className="form-control"
                         placeholder="Enter image url.."
                       />
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-25">
+                        <label>Title</label>
+                      </div>
+                    <div className="col-75">
+                      <input
+                        type="text"
+                        onChange={this.handleChangeTitle}
+                        value={this.state.title}
+                        className="form-control"
+                        placeholder="Enter a title.."
+                      />
+                    </div>
                     </div>
                     <div className="row">
                       <div className="col-25">
@@ -107,25 +111,6 @@ export default class Navbar extends React.Component {
                         />
                       </div>
                     </div>
-                    <div className="col-75">
-                      <input
-                        type="text"
-                        onChange={this.handleChangeTitle}
-                        value={this.state.title}
-                        className="form-control"
-                        placeholder="Enter a title.."
-                      />
-                    </div>
-                    <div className="row">
-                      <button
-                        id="btn"
-                        className="form-control btn-primary"
-                        onClick={this.props.handler}
-                      >
-                        Upload
-                      </button>
-                    </div>
-                  </div>
                   <div className="row">
                     <div className="col-25">
                       <label>Subject</label>
@@ -135,6 +120,7 @@ export default class Navbar extends React.Component {
                         onChange={this.handleChangeSubject}
                         value={this.state.subject}
                         className="form-control"
+                        id="desc"
                         name="subject"
                         placeholder="Write something.."
                         style={{ height: "200px" }}
@@ -149,6 +135,7 @@ export default class Navbar extends React.Component {
                     >
                       Upload
                     </button>
+                  </div>
                   </div>
               </Popup>
               )}

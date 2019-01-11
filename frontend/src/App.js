@@ -84,11 +84,12 @@ export class App extends Component {
   render() {
     return (
       <div style={{marginTop: this.props.isLoggedIn ? 45 : 0}} className="App">
+        <Navbar handler={this.uploadPost} handleLogout={this.props.logout} isLoggedIn={this.props.isLoggedIn} />
         {!this.props.isLoggedIn ?(
             <Login />
         ) : (
           <>
-          <Navbar handler={this.uploadPost} handleLogout={this.props.logout} />
+          
           <Posts items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} />
           </>
         )}
