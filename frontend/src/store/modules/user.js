@@ -3,7 +3,6 @@ import qs from 'qs'
 
 if (window.localStorage.getItem('token') && window.localStorage.getItem('token') !== 'undefined') {
   axios.defaults.headers.common['Authorization'] = window.localStorage.getItem('token')
-  console.log(window.localStorage.getItem('token'))
 }
 
 const defaultState = {
@@ -79,6 +78,7 @@ const reducer = (state = defaultState, action) => {
       return {
         ...state,
         auth: true,
+        name: action.payload.user.displayName,
       }
     }
     case types.logout : {
