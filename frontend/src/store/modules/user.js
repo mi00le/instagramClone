@@ -1,8 +1,9 @@
 import axios from 'axios'
 import qs from 'qs'
 
-if (window.localStorage.getItem('token')) {
+if (window.localStorage.getItem('token') && window.localStorage.getItem('token') !== 'undefined') {
   axios.defaults.headers.common['Authorization'] = window.localStorage.getItem('token')
+  console.log(window.localStorage.getItem('token'))
 }
 
 const defaultState = {

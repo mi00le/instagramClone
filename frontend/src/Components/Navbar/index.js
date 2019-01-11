@@ -2,6 +2,7 @@ import React from "react";
 import "./navbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
+// import Tags from "../../Components/Tags/index.js";
 
 import Popup from "reactjs-popup";
 import TagsInput from "react-tagsinput";

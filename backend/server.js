@@ -71,7 +71,7 @@ app.route("/posts/:userId").get(async (req, res) => {
 
 app.route("/posts").get(async (req, res) => {
     try {
-        const posts = await dbPosts.getAllPosts(req.query.limit, req.query.tag);
+        const posts = await dbPosts.getAllPosts(req.query.limit, req.query.tag, req.query.cursor);
         res.json({ posts });
     } catch (e) {
         res.status(500).send("Something broke!");

@@ -52,7 +52,6 @@ export class App extends Component {
     for(let i = 0; i < a.length; i++){
       tagArr.push(a[i].innerText);
     }
-
     try {
       const res = await axios.post(
         `http://localhost:3002/posts/${userId}`,
@@ -102,17 +101,6 @@ export class App extends Component {
     });
   }
 
-  login = (email, username, id, token) => {
-    this.setState({
-      username: username,
-      userId: id
-    });
-    localStorage.setItem("email", email);
-    localStorage.setItem("username", username);
-    localStorage.setItem("id", id);
-    localStorage.setItem("token", token);
-  }
-
   userClick = (id) => {
     this.setState({
       id: id,
@@ -130,6 +118,7 @@ export class App extends Component {
       </div>
     );
   }
+
 }
 
 const mapStateToProps = ({ user }) => ({
