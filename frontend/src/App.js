@@ -31,54 +31,14 @@ export class App extends Component {
     });
 
   }
-
-  updateInfo = async () => {
-    const {
-      userId,
-      username,
-    } = this.state
-
-    const u = document.querySelector("#imgUrl");
-    const t = document.querySelector("#title");
-    const d = document.querySelector("#desc");
-    const tag = document.querySelector("#tags");
-
-
-
-    let a = document.querySelectorAll('.react-tagsinput-tag');
-
-    let tagArr = [];
-    for(let i = 0; i < a.length; i++){
-      tagArr.push(a[i].innerText);
-    }
-    try {
-      const res = await axios.post(
-        `http://localhost:3002/posts/${userId}`,
-        qs.stringify({
-          username,
-          image: u.value,
-          title: t.value,
-          description: d.value,
-          tags: tagArr
-        }),
-      )
-
-      if (res.data.post) {
-        this.setState({ posts: [res.data.post, ...this.state.posts] });
-      } else {
-        this.refreshPosts();
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-  uploadPost = (imgUrl, title, tags, subject, userId) => {
+  uploadPost = (imgUrl, title, tags, subject) => {
     const items = {
       imgUrl,
       title,
       tags,
       subject,
-      userId
+      userId: window.localStorage.getItem('id'),
+      username: this.props.username
     }
     this.props.uploadPost(items)
   }
@@ -103,12 +63,13 @@ export class App extends Component {
 const mapStateToProps = ({ user }) => ({
   isLoggedIn: user.auth,
   userId: user.id,
+  username: user.name
 })
 
 const mapDispatchToProps = dispatch => ({
   getUser: (id) => dispatch(actions.getUser(id)),
   logout : () => dispatch(actions.logout()),
-  uploadPost : () => dispatch(postActions.uploadPost()),
+  uploadPost : (info) => dispatch(postActions.uploadPost(info)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

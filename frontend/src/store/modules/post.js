@@ -47,22 +47,24 @@ export const actions = {
       }
     },
     uploadPost: (info) =>
-      dispatch =>
+      dispatch => {
         axios.post(
-          `http://localhost:3002/posts/${info.userId}`, qs.stringify({
-            username: "test",
-            image: info.imageUrl,
+          `http://localhost:3002/posts/${info.userId}`,
+          qs.stringify({
+            username: info.username,
+            image: info.imgUrl,
             title: info.title,
-            description: info.description,
+            description: info.subject,
             tags: info.tags
-          }),)
+          }))
           .then(({ data }) => {
             return dispatch({
               type: types.uploadPostSuccess,
-              payload: data
+              payload: data.post
             })
           })
-          .catch(() => dispatch({ type: types.uploadPostFailure})),
+          .catch((error) => dispatch({ type: types.uploadPostfailure }))
+      },
 }
 
 const reducer = (state = defaultState, action) => {
@@ -89,7 +91,8 @@ const reducer = (state = defaultState, action) => {
     }
     case types.uploadPostSuccess: {
       return {
-        ...state
+        ...state,
+        posts: [action.payload, ...state.posts]
       }
     }
     default: return state

@@ -15,7 +15,6 @@ class Posts extends Component {
     this.loadMore();
   }
   loadMore = () => {
-    console.log(this.state.id)
     if (this.state.id) {
       this.props.getUserPosts(this.state.id);
     }
@@ -43,7 +42,6 @@ class Posts extends Component {
   }
 
   render() {
-    console.log(this.props.posts)
     return (
       <div>
         <Grid>

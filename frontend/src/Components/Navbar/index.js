@@ -129,7 +129,12 @@ export default class Navbar extends React.Component {
                     <button
                       id="btn"
                       className="form-control btn-primary"
-                      onClick={() => {this.props.handler()}}
+                      onClick={() => {this.props.handler(
+                        this.state.imageUrl,
+                        this.state.title,
+                        this.state.tags,
+                        this.state.subject,
+                      )}}
                     >
                       Upload
                     </button>
