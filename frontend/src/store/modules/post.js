@@ -1,27 +1,68 @@
-import axios from 'axios'
+import axios from 'axios';
+import qs from 'qs';
 
 const defaultState = {
   posts: [],
+  cursor: 0,
 }
 
 const types = {
   getPostsSuccess: 'post/getPosts/success',
+  getUserPostsSuccess: 'post/getUserPosts/success',
+  getUserPostsFailure: 'post/getUserPosts/failure',
   getPostsFailure: 'post/getPosts/failure',
+  clearPosts: 'post/clearPosts',
+  uploadPostSuccess: 'post/uploadPost/sucess',
+  uploadPostfailure: 'post/uploadPost/failure',
 }
 
 export const actions = {
-  getPosts: (count) =>
+  getPosts: (count, cursor) =>
     dispatch =>
       axios.get(
-        `http://localhost:3002/posts?limit=${count}`)
+        `http://localhost:3002/posts?limit=${count}&cursor=${cursor}`)
         .then(({ data }) => {
-          console.log(data.posts);
           return dispatch({
             type: types.getPostsSuccess,
-            payload: data.posts
+            payload: data.posts,
+            total: count + cursor,
           })
         })
         .catch(() => dispatch({ type: types.getPostsFailure })),
+    getUserPosts: (id) =>
+      dispatch =>
+        axios.get(
+          `http://localhost:3002/posts?id=${id}`)
+          .then(({ data }) => {
+            return dispatch({
+              type: types.getUserPostsSuccess,
+              payload: data.posts,
+            })
+          })
+          .catch(() => dispatch({ type: types.getUserPostsFailure })),
+    clearPosts: () => {
+      return {
+        type: types.clearPosts,
+        cursor: 0,
+      }
+    },
+    uploadPost: (info) =>
+      dispatch =>
+        axios.post(
+          `http://localhost:3002/posts/${info.userId}`, qs.stringify({
+            username: "test",
+            image: info.imageUrl,
+            title: info.title,
+            description: info.description,
+            tags: info.tags
+          }),)
+          .then(({ data }) => {
+            return dispatch({
+              type: types.uploadPostSuccess,
+              payload: data
+            })
+          })
+          .catch(() => dispatch({ type: types.uploadPostFailure})),
 }
 
 const reducer = (state = defaultState, action) => {
@@ -29,7 +70,26 @@ const reducer = (state = defaultState, action) => {
     case types.getPostsSuccess: {
       return {
         ...state,
-        posts: action.payload
+        posts: state.posts.concat(action.payload),
+        cursor: action.total
+      }
+    }
+    case types.getUserPostsSuccess: {
+      return {
+        ...state,
+        posts: action.payload,
+      }
+    }
+    case types.clearPosts: {
+      return {
+        ...state,
+        posts: [],
+        cursor: action.cursor
+      }
+    }
+    case types.uploadPostSuccess: {
+      return {
+        ...state
       }
     }
     default: return state

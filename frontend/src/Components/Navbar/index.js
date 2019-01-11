@@ -15,21 +15,39 @@ const tagLength = 10;
 export default class Navbar extends React.Component {
   constructor() {
     super();
-    this.state = { tags: [], tag: "" };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleChangeInput = this.handleChangeInput.bind(this);
+    this.state = {
+      tags: [],
+      tag: "",
+      imageUrl: "",
+      title: "",
+      subject: ""
+    };
   }
 
-  handleChange(tags) {
+  handleChange = (tags) => {
     this.setState({ tags });
   }
 
-  handleChangeInput(tag) {
-    if (tag.length <= tagLength) {
+  handleChangeInput = (tag) => {
+    if(tag.length <= tagLength){
       this.setState({ tag });
     }
   }
-
+  handleChangeImage = (event) => {
+    this.setState({
+      imageUrl: event.target.value
+    })
+  }
+  handleChangeTitle = (event) => {
+    this.setState({
+      title: event.target.value
+    })
+  }
+  handleChangeSubject = (event) => {
+    this.setState({
+      subject: event.target.value
+    })
+  }
   render() {
     return (
       <BSNavbar fixedTop collapseOnSelect className="navbar-main">
@@ -66,19 +84,14 @@ export default class Navbar extends React.Component {
                         />
                       </div>
                     </div>
-                    <div className="row">
-                      <div className="col-25">
-                        <label>Title</label>
-                      </div>
-                      <div className="col-75">
-                        <input
-                          type="text"
-                          className="form-control input-style"
-                          id="title"
-                          placeholder="Title"
-                          required
-                        />
-                      </div>
+                    <div className="col-75">
+                      <input
+                        type="text"
+                        onChange={this.handleChangeImage}
+                        value={this.state.imageUrl}
+                        className="form-control"
+                        placeholder="Enter image url.."
+                      />
                     </div>
                     <div className="row">
                       <div className="col-25">
@@ -94,19 +107,14 @@ export default class Navbar extends React.Component {
                         />
                       </div>
                     </div>
-                    <div className="row">
-                      <div className="col-25">
-                        <label>Subject</label>
-                      </div>
-                      <div className="col-75">
-                        <textarea
-                          id="desc"
-                          className="form-control"
-                          name="subject"
-                          placeholder="Write something.."
-                          style={{ height: "200px" }}
-                        />
-                      </div>
+                    <div className="col-75">
+                      <input
+                        type="text"
+                        onChange={this.handleChangeTitle}
+                        value={this.state.title}
+                        className="form-control"
+                        placeholder="Enter a title.."
+                      />
                     </div>
                     <div className="row">
                       <button
@@ -118,7 +126,31 @@ export default class Navbar extends React.Component {
                       </button>
                     </div>
                   </div>
-                </Popup>
+                  <div className="row">
+                    <div className="col-25">
+                      <label>Subject</label>
+                    </div>
+                    <div className="col-75">
+                      <textarea
+                        onChange={this.handleChangeSubject}
+                        value={this.state.subject}
+                        className="form-control"
+                        name="subject"
+                        placeholder="Write something.."
+                        style={{ height: "200px" }}
+                      />
+                    </div>
+                  </div>
+                  <div className="row">
+                    <button
+                      id="btn"
+                      className="form-control btn-primary"
+                      onClick={() => {this.props.handler()}}
+                    >
+                      Upload
+                    </button>
+                  </div>
+              </Popup>
               )}
             </Col>
             <Col xs={4} className="col-right">
