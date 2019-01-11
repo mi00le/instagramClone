@@ -46,6 +46,13 @@ export class App extends Component {
     const d = document.querySelector("#desc");
     const tag = document.querySelector("#tags");
 
+    let a = document.querySelectorAll('.react-tagsinput-tag');
+
+    let tagArr = [];
+    for(let i = 0; i < a.length; i++){
+      tagArr.push(a[i].innerText);
+    }
+
     try {
       const res = await axios.post(
         `http://localhost:3002/posts/${userId}`,
@@ -54,7 +61,7 @@ export class App extends Component {
           image: u.value,
           title: t.value,
           description: d.value,
-          tags: tag.value
+          tags: tagArr
         }),
       )
 
@@ -71,19 +78,19 @@ export class App extends Component {
   refreshPosts = () => {
     if (!this.state.id) {
       axios.get("http://localhost:3002/posts?limit=" + this.state.postCount)
-        .then((response) => {
-          this.setState({
-            posts: response.data.posts
-          });
-        }).catch(() => { });
+      .then((response) => {
+        this.setState({
+          posts: response.data.posts
+        });
+      }).catch(() => { });
     }
     else {
       axios.get("http://localhost:3002/posts/" + this.state.id)
-        .then((response) => {
-          this.setState({
-            posts: response.data.posts
-          });
-        }).catch(() => { });
+      .then((response) => {
+        this.setState({
+          posts: response.data.posts
+        });
+      }).catch(() => { });
     }
   }
 
@@ -119,7 +126,7 @@ export class App extends Component {
     return (
       <div style={{marginTop: this.state.username ? 30 : 0}} className="App">
       <Navbar handler={this.updateInfo} handleLogout={this.props.logout} isLoggedIn={this.props.isLoggedIn} />
-        {this.props.isLoggedIn ? <Posts profile items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} />}
+      {this.props.isLoggedIn ? <Posts profile items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} />}
       </div>
     );
   }
