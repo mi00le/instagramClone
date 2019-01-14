@@ -1,130 +1,76 @@
 import React, { Component } from "react";
 import axios from "axios";
 import qs from "qs";
+import { connect } from 'react-redux'
 import "./App.css";
+import { actions } from './store/modules/user'
+import { actions as postActions } from './store/modules/post'
 
 import Navbar from "./Components/Navbar/";
 import Login from "./Components/Login/";
 import Posts from "./Components/Posts/";
 
+const deafultPostCount = 5;
 const amountToAdd = 10;
 
-class App extends Component {
+export class App extends Component {
   state = {
-    posts: [],
     username: localStorage.getItem("username"),
     userId: localStorage.getItem("id"),
-    postCount: 5,
-    id: 0,
   };
 
   componentDidMount() {
-    this.refreshPosts();
+    this.props.getUser(this.props.userId)
   }
 
   checkUser = () => {
     localStorage.clear();
     this.setState({
       username: null
+
     });
+
   }
-
-  updateInfo = async () => {
-    const {
-      userId,
-      username,
-    } = this.state
-
-    const u = document.querySelector("#imgUrl");
-    const t = document.querySelector("#title");
-    const d = document.querySelector("#desc");
-    const tag = document.querySelector("#tags");
-
-
-
-    let a = document.querySelectorAll('.react-tagsinput-tag');
-
-    let tagArr = [];
-    for(let i = 0; i < a.length; i++){
-      tagArr.push(a[i].innerText);
+  uploadPost = (imgUrl, title, tags, subject) => {
+    const items = {
+      imgUrl,
+      title,
+      tags,
+      subject,
+      userId: window.localStorage.getItem('id'),
+      username: this.props.username
     }
-    try {
-      const res = await axios.post(
-        `http://localhost:3002/posts/${userId}`,
-        qs.stringify({
-          username,
-          image: u.value,
-          title: t.value,
-          description: d.value,
-          tags: tagArr
-        }),
-      )
-
-      if (res.data.post) {
-        this.setState({ posts: [res.data.post, ...this.state.posts] });
-      } else {
-        this.refreshPosts();
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  refreshPosts = () => {
-    if (!this.state.id) {
-      axios.get("http://localhost:3002/posts?limit=" + this.state.postCount)
-        .then((response) => {
-          this.setState({
-            posts: response.data.posts
-          });
-        }).catch(() => { });
-    }
-    else {
-      axios.get("http://localhost:3002/posts/" + this.state.id)
-        .then((response) => {
-          this.setState({
-            posts: response.data.posts
-          });
-        }).catch(() => { });
-    }
-  }
-
-  loadMorePosts = () => {
-    this.setState({
-      postCount: this.state.postCount + amountToAdd,
-    }, () => {
-      this.refreshPosts();
-    });
-  }
-
-  login = (email, username, id, token) => {
-    this.setState({
-      username: username,
-      userId: id
-    });
-    localStorage.setItem("email", email);
-    localStorage.setItem("username", username);
-    localStorage.setItem("id", id);
-    localStorage.setItem("token", token);
-  }
-
-  userClick = (id) => {
-    this.setState({
-      id: id
-    }, () => {
-      this.refreshPosts();
-    });
+    this.props.uploadPost(items)
   }
 
   render() {
     return (
-      <div style={{ background: this.state.username ? "#f7f7f7" : "#fff" }} className="App">
-        <Navbar handler={this.updateInfo} handleLogout={this.checkUser} />
-        {this.state.username ? <Posts profile={this.state.id} items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} /> : <Login sucessFunction={this.login} />}
+      <div style={{marginTop: this.props.isLoggedIn ? 45 : 0}} className="App">
+        <Navbar handler={this.uploadPost} handleLogout={this.props.logout} isLoggedIn={this.props.isLoggedIn} />
+        {!this.props.isLoggedIn ?(
+            <Login />
+        ) : (
+          <>
+          
+          <Posts items={this.state.posts} loadMore={this.loadMorePosts} userClick={this.userClick} />
+          </>
+        )}
       </div>
     );
   }
 
 }
 
-export default App;
+const mapStateToProps = ({ user }) => ({
+  isLoggedIn: user.auth,
+  userId: user.id,
+  username: user.name
+})
+
+const mapDispatchToProps = dispatch => ({
+  getUser: (id) => dispatch(actions.getUser(id)),
+  logout : () => dispatch(actions.logout()),
+  uploadPost : (info) => dispatch(postActions.uploadPost(info)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

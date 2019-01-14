@@ -15,19 +15,38 @@ const tagLength = 10;
 export default class Navbar extends React.Component {
   constructor() {
     super();
-    this.state = { tags: [], tag: "" };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleChangeInput = this.handleChangeInput.bind(this);
+    this.state = {
+      tags: [],
+      tag: "",
+      imageUrl: "",
+      title: "",
+      subject: ""
+    };
   }
 
-  handleChange(tags) {
+  handleChange = (tags) => {
     this.setState({ tags });
   }
 
-  handleChangeInput(tag) {
+  handleChangeInput = (tag) => {
     if(tag.length <= tagLength){
       this.setState({ tag });
     }
+  }
+  handleChangeImage = (event) => {
+    this.setState({
+      imageUrl: event.target.value
+    })
+  }
+  handleChangeTitle = (event) => {
+    this.setState({
+      title: event.target.value
+    })
+  }
+  handleChangeSubject = (event) => {
+    this.setState({
+      subject: event.target.value
+    })
   }
   render() {
     return (
@@ -35,68 +54,73 @@ export default class Navbar extends React.Component {
         <Grid className="grid">
           <Row className="show-grid">
             <Col xs={4} className="col-left">
-              <Popup
-                className="w3-animate-top popup"
-                trigger={
-                  <FontAwesomeIcon
-                    href="#brand"
-                    id="basic-nav-dropdown"
-                    icon={faCamera}
-                    className="camera-icon"
-                  />
-                }
-                modal
-                closeOnDocumentClick
-              >
-                <div className="form-container">
-                  <div className="row">
-                    <div className="col-25">
-                      <label>Image</label>
-                    </div>
-                    <div className="col-75">
+              {this.props.isLoggedIn && (
+                <Popup
+                  className="w3-animate-top popup"
+                  trigger={
+                    <FontAwesomeIcon
+                      href="#brand"
+                      id="basic-nav-dropdown"
+                      icon={faCamera}
+                      className="camera-icon"
+                    />
+                  }
+                  modal
+                  closeOnDocumentClick
+                >
+                  <div className="form-container">
+                    <div className="row">
+                      <div className="col-25">
+                        <label>Image</label>
+                      </div>
+                      <div className="col-75">
                       <input
                         type="text"
-                        id="imgUrl"
+                        onChange={this.handleChangeImage}
+                        value={this.state.imageUrl}
                         className="form-control"
                         placeholder="Enter image url.."
                       />
+                      </div>
                     </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-25">
-                      <label>Title</label>
-                    </div>
+                    <div className="row">
+                      <div className="col-25">
+                        <label>Title</label>
+                      </div>
                     <div className="col-75">
                       <input
                         type="text"
-                        id="title"
+                        onChange={this.handleChangeTitle}
+                        value={this.state.title}
                         className="form-control"
                         placeholder="Enter a title.."
                       />
                     </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-25">
-                      <label>Tags</label>
                     </div>
-                    <div className="col-75">
-                      <TagsInput
-                        maxTags="3"
-                        value={this.state.tags}
-                        onChange={this.handleChange.bind(this)}
-                        inputValue={this.state.tag}
-                        onChangeInput={this.handleChangeInput.bind(this)}
-                      />
+                    <div className="row">
+                      <div className="col-25">
+                        <label>Tags</label>
+                      </div>
+                      <div className="col-75">
+                        <TagsInput
+                          maxTags="3"
+                          value={this.state.tags}
+                          onChange={this.handleChange.bind(this)}
+                          inputValue={this.state.tag}
+                          onChangeInput={this.handleChangeInput.bind(this)}
+                        />
+                      </div>
                     </div>
-                  </div>
                   <div className="row">
                     <div className="col-25">
                       <label>Subject</label>
                     </div>
                     <div className="col-75">
                       <textarea
-                        id="desc"
+                        onChange={this.handleChangeSubject}
+                        value={this.state.subject}
                         className="form-control"
+                        id="desc"
                         name="subject"
                         placeholder="Write something.."
                         style={{ height: "200px" }}
@@ -107,27 +131,41 @@ export default class Navbar extends React.Component {
                     <button
                       id="btn"
                       className="form-control btn-primary"
-                      onClick={this.props.handler}
+                      onClick={() => {this.props.handler(
+                        this.state.imageUrl,
+                        this.state.title,
+                        this.state.tags,
+                        this.state.subject,
+                      )}}
                     >
                       Upload
                     </button>
                   </div>
-                </div>
+                  </div>
               </Popup>
+              )}
             </Col>
             <Col xs={4} className="col-right">
               <a href="#top" className="insta-clone">
-                <p className="insta-clone disable-select ">InstaClone</p>
+                <p
+                  className={`disable-select ${
+                    this.props.isLoggedIn ? "insta-clone" : "insta-cloneToggle"
+                  }`}
+                >
+                  InstaClone
+                </p>
               </a>
             </Col>
             <Col xs={4} className="col-right">
-              <a
-                href="#logout"
-                className="logout-nav"
-                onClick={this.props.handleLogout}
-              >
-                <p className="logout-nav disable-select ">Logout</p>
-              </a>
+              {this.props.isLoggedIn && (
+                <a
+                  href="#logout"
+                  className="logout-nav"
+                  onClick={this.props.handleLogout}
+                >
+                  <p className="logout-nav disable-select ">Logout</p>
+                </a>
+              )}
             </Col>
           </Row>
         </Grid>

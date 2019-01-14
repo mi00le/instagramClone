@@ -11,21 +11,16 @@ const db = sql.getDb();
  * @param {string} userName - Post author's display name
  * @param {string|number} userId - Post author's ID
  */
-exports.createPost = (image, title, description, tags, userName, userId) => new Promise(async (resolve, reject) => {
+exports.createPost = (image, title = "", description = "", tags = "", userName, userId) => new Promise(async (resolve, reject) => {
     try {
-        if (!userId || !userName) {
+        if (!userId) {
             return reject();
         }
-    
-        title = title ? title : "";
-        description = description ? description : "";
-        tags = tags ? tags : "";
-    
+
         const currentTime = new Date().getTime();
-    
         const prep = db.prepare("INSERT INTO Posts(AuthorID, AuthorName, Url, CreatedAt, Title, Description, Tags) VALUES(?, ?, ?, ?, ?, ?, ?)");
         const result = prep.run(userId, userName, image, currentTime, title, description, tags);
-    
+
         return resolve({
             id: result.lastInsertRowid,
             userId: userId,
@@ -58,11 +53,11 @@ exports.getPost = (postId) => new Promise(async (resolve, reject) => {
  * Get all posts, up to an optional limit
  * @param {number} [limit=-1] - How many posts to return
  * @param {string} [tag]
+ * @param {string} [cursor=0]
  */
-exports.getAllPosts = (limit = -1, tag) => new Promise(async (resolve, reject) => {
+exports.getAllPosts = (limit = -1, tag = "", cursor = 0) => new Promise(async (resolve, reject) => {
     try {
-        if (!tag) tag = "";
-        const rows = await db.prepare("SELECT * FROM Posts WHERE instr(Tags, ?)").all(tag);
+        const rows = await db.prepare("SELECT * FROM Posts WHERE instr(Tags, ?) LIMIT ?, ?").all(tag, cursor, limit);
         return resolve(rows ? rows.reverse().slice(0, limit < 0 ? rows.length : limit).map(utils.toClientStructure) : []);
     } catch (e) {
         return reject(e);
@@ -104,7 +99,7 @@ exports.updatePost = (postId, title, description, tags) => new Promise(async (re
             (tags ? tags : row.Tags),
             postId
         );
-        
+
         return resolve(result.changes > 0);
     } catch (e) {
         return reject(e);

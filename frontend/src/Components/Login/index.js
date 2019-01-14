@@ -1,10 +1,12 @@
 import React, { Component } from "react";
-import {Col} from "react-bootstrap";
+import { Col } from "react-bootstrap";
 import axios from "axios";
 import qs from "qs";
+import { connect } from 'react-redux'
+import { actions } from '../../store/modules/user'
 
 const loginBox = {
-  margin : "200px auto",
+  margin: "auto",
   float: "none",
   borderStyle: "solid",
   borderColor: "#e6e6e6",
@@ -25,18 +27,21 @@ const loginInput = {
   borderColor: "#e6e6e6",
 }
 const loginDiv = {
-    height: "100%",
-    position: "relative",
-    height: 800
+  position: "relative",
+  height: "100vh",
+  display: "flex",
+  alignItems: "center",
 }
 
-export default class Login extends Component {
+export class Login extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       register: false,
-      errorMsg: ""
+      errorMsg: "",
+      email: '',
+      password: '',
     };
 
     this.swapSetting = this.swapSetting.bind(this);
@@ -44,76 +49,94 @@ export default class Login extends Component {
     this.register = this.register.bind(this);
   }
 
-  swapSetting(){
+  swapSetting() {
     this.setState({
       register: !this.state.register,
       errorMsg: ""
     });
   }
 
-  login(){
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value
-    axios.post("http://localhost:3002/users/auth", qs.stringify({email: email,password: password}))
-    .then((res) => {
-      console.log(res);
-        if (!res.data.auth.success){throw new Error(res.data.auth.err.message)};
-        this.props.sucessFunction(email, res.data.auth.user.displayName, res.data.auth.user.id, res.data.auth.token);
-    }).catch((err) => {
-        console.log(err);
+  login(e) {
+    e.preventDefault()
+    const {
+      email,
+      password,
+    } = this.state
+    this.props.login({ email, password })
+    /*
+    console.log("login");
+    axios.post("http://localhost:3002/users/auth", qs.stringify({ email: this.state.email, password: this.state.password }))
+      .then((res) => {
+        if (!res.data.auth.success) { throw new Error(res.data.auth.err.message) };
+        this.props.sucessFunction(this.state.email, res.data.auth.user.displayName, res.data.auth.user.id, res.data.token);
+        console.log("sucess");
+      }).catch((err) => {
+        console.log("err");
         this.setState({
+          email: "",
+          password: "",
           errorMsg: err.message,
           register: false
         });
-    });
+      });
+      */
   }
-
-  register(){
-    const email = document.getElementById('email').value;
+  handleChange = (event) => {
+    this.setState({ email: event.target.value });
+  }
+  handleChangePass = (event) => {
+    this.setState({ password: event.target.value });
+  }
+  handleUsername = (event) => {
+    this.setState({ username : event.target.value });
+  }
+  register(e) {
+    e.preventDefault();
     const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const password2 = document.getElementById('password2').value;
+    const password = document.getElementById('password2').value;
 
-    if (password != password2) {
+
+
+    if (this.state.password !== password) {
       this.setState({
         errorMsg: "Passwords does not match",
       });
       return
     }
-    axios.post("http://localhost:3002/users", qs.stringify({email: email,password: password, displayName: username}))
-    .then((res) => {
-      console.log(res);
-      if(!res.data.data.success){throw new Error(res.data.data.err.message)};
-      this.props.sucessFunction(email, username, res.data.data.user.id);
-    }).catch((err) => {
-        this.setState({
-          errorMsg: err.message,
-          register: true
-        });
-    });
+    const {
+      email,
+    } = this.state
+    this.props.register({ email, password, displayName : username })
   }
 
   render() {
     return (
       <div style={loginDiv}>
-        <Col sm={8} md={4} style={loginBox}>
+        <Col xs={12} sm={6} md={4} style={loginBox}>
           <h1>{this.state.register ? "Register" : "Login"}</h1>
           <hr />
-          {this.state.errorMsg && <p>{this.state.errorMsg}</p>}
-          <form>
+          {this.state.errorMsg && <p className="ErrorMsg">{this.state.errorMsg}</p>}
+          <form onSubmit={this.state.register ? this.register : this.login}>
             <h4>Email</h4>
-            <input style={loginInput} id="email" type="email" autoFocus/>
+            <input style={loginInput} value={this.state.value} onChange={this.handleChange} id="email" type="email" autoFocus />
             {this.state.register && <h4>Username</h4>}
-            {this.state.register && <input style={loginInput} id="username" type="text"/>}
+            {this.state.register && <input style={loginInput} id="username" type="text" />}
             <h4>Password</h4>
-            <input style={loginInput} id="password" type="password"/>
+            <input style={loginInput} value={this.state.value} onChange={this.handleChangePass} id="password" type="password" />
             {this.state.register && <h4>Confirm password</h4>}
-            {this.state.register && <input style={loginInput} id="password2" type="password"/>}
-            <input style={loginInput} onClick={this.state.register ? this.register : this.login} type="button" value={this.state.register ? "Register" : "Login"} />
-          <a style={{marginBottom: 10, display: "block"}} onClick={this.swapSetting}>{this.state.register ? "Already registered? Login!" : "New? Register!"}</a>
+            {this.state.register && <input style={loginInput} id="password2" type="password" />}
+            <input style={loginInput} type="submit" value={this.state.register ? "Register" : "Login"} />
+            <a style={{ marginBottom: 10, display: "block" }} onClick={this.swapSetting}>{this.state.register ? "Already registered? Login!" : "New? Register!"}</a>
           </form>
         </Col>
       </div>
     );
   }
 }
+
+const mapDispatchToProps = dispatch => ({
+  login: credentials => dispatch(actions.login(credentials)),
+  register : credentials => dispatch(actions.register(credentials)),
+})
+
+export default connect(null, mapDispatchToProps)(Login)

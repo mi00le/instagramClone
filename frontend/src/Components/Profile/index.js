@@ -30,7 +30,7 @@ export default class Profile extends Component{
           <Col xs={6} sm={4} md={3} style={flexItem}><h4>Newest: {new Date(this.props.newest).toLocaleDateString()}</h4></Col>
         </div>
         <button style={profileButton} onClick={() => {this.props.userClick(0)}}>Go back!</button>
-        <hr style={{margin: "20px 0 auto", background: "black"}} />
+        <hr style={{margin: "38px 0 auto", background: "black"}} />
       </div>
     )
   }

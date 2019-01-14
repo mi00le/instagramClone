@@ -1,0 +1,108 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Login should match snapshot 1`] = `
+<div
+  style={
+    Object {
+      "alignItems": "center",
+      "display": "flex",
+      "height": "100vh",
+      "position": "relative",
+    }
+  }
+>
+  <div
+    className="col-md-4 col-sm-6 col-xs-12"
+    style={
+      Object {
+        "background": "#fff",
+        "borderColor": "#e6e6e6",
+        "borderRadius": 3,
+        "borderStyle": "solid",
+        "borderWidth": 1,
+        "float": "none",
+        "margin": "auto",
+        "padding": "0",
+      }
+    }
+  >
+    <h1>
+      Login
+    </h1>
+    <hr />
+    
+    <form
+      onSubmit={[Function]}
+    >
+      <h4>
+        Email
+      </h4>
+      <input
+        autoFocus={true}
+        id="email"
+        onChange={[Function]}
+        style={
+          Object {
+            "borderColor": "#e6e6e6",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "display": "block",
+            "height": 30,
+            "margin": "12px auto",
+            "padding": 2,
+            "width": "80%",
+          }
+        }
+        type="email"
+      />
+      <h4>
+        Password
+      </h4>
+      <input
+        id="password"
+        onChange={[Function]}
+        style={
+          Object {
+            "borderColor": "#e6e6e6",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "display": "block",
+            "height": 30,
+            "margin": "12px auto",
+            "padding": 2,
+            "width": "80%",
+          }
+        }
+        type="password"
+      />
+      <input
+        style={
+          Object {
+            "borderColor": "#e6e6e6",
+            "borderRadius": 3,
+            "borderWidth": 1,
+            "display": "block",
+            "height": 30,
+            "margin": "12px auto",
+            "padding": 2,
+            "width": "80%",
+          }
+        }
+        type="submit"
+        value="Login"
+      />
+      <a
+        onClick={[Function]}
+        style={
+          Object {
+            "display": "block",
+            "marginBottom": 10,
+          }
+        }
+      >
+        New? Register!
+      </a>
+    </form>
+  </div>
+</div>
+`;
